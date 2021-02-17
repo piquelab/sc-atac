@@ -5,7 +5,6 @@
 #SBATCH --time=2-01:00:00
 #SBATCH -N 1-1
 #SBATCH -n 10
-#SBATCH --output=output_${sample}.log
 
 set -v
 set -e 
