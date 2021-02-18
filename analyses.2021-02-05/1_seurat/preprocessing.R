@@ -1,15 +1,15 @@
 #module load R/test_4.0.3
 ###
-setwd("./1_seurat/")
+#setwd("/nfs/rprdata/julong/sc-atac/analyses.2021-02-05/1_seurat")
 source("../LibraryPackage.R")
 
 outdir <- "./outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
-################################################
-### 1, generate folders containing h5ad data ###
-################################################
+rm(list=ls())
 
+###
+### 1, generate folders
 basefolder <- "/nfs/rprdata/julong/sc-atac/count.SCAIP.2021-01-14/"
 expNames <- dir(basefolder,"^SCAIP*")
 folders <- paste0(basefolder, expNames, "/", sep="")
@@ -18,8 +18,10 @@ folders <- folders[ind]
 expNames <- expNames[ind]
 names(folders) <- expNames
 
+
 ###
-###
+### 2, creating a common peak set
+if(FALSE){
 expNames <- names(folders)
 peaks <- lapply(expNames, function(ii){
    fn <- paste(folders[ii], "outs/filtered_peak_bc_matrix/peaks.bed", sep="")
@@ -33,18 +35,112 @@ combined.peaks <- GenomicRanges::reduce(x=x2)
 peakwidths <- GenomicRanges::width(combined.peaks)
 combined.peaks <- combined.peaks[peakwidths<10000&peakwidths>20]
 write_rds(combined.peaks, file="./outs/combined.peaks.rds")
+}
 
-### read ATAC project
-readATAC <- function(run, peaks, threshold){
 
-metafn <- paste(run, "outs/singlecell.csv", sep="")
-meta <- fread(metafn)%>%filter(passed_filters>threshold)
+###
+### 3, combined seurat object
+if(FALSE){
 
-fragfn <- paste(run, "outs/fragments.tsv.gz", sep="")
-frags <- CreateFragmentObject(path=fragfn, cells=meta$barcode)
+### read ATAC function
+readATAC <- function(run, peaks, threshold=500){
+
+### load metadata
+   metafn <- paste(run, "outs/singlecell.csv", sep="")
+   meta <- fread(metafn)%>%filter(passed_filters>threshold)
+
+### create fragment object
+   fragfn <- paste(run, "outs/fragments.tsv.gz", sep="")
+   frags <- CreateFragmentObject(path=fragfn, cells=meta$barcode)
 
 ### quantify peaks
-counts <- FeatureMatrix(fragments=frags, features=combined.peaks, cells=meta$barcode) 
+   counts <- FeatureMatrix(fragments=frags, features=peaks, cells=meta$barcode)
+
+### create a seurat object
+   assay <- CreateChromatinAssay(counts, fragments=frags)
+   atac <- CreateSeuratObject(assay, assay="ATAC")
+
+   atac 
+}###
+
+###
+### merge multiple objects
+combined.peaks <- read_rds("./outs/combined.peaks.rds")
+expNames <- names(folders)
+atac_ls <- future_map(expNames, function(ii){
+   cat(ii,"\n")
+   atac <- readATAC(run=folders[ii], peaks=combined.peaks, threshold=500)
+   atac <- RenameCells(atac, add.cell.id=ii)
+   atac
+})
+###
+
+combined <- merge(atac_ls[[1]], atac_ls[-1], project="sc-atac")
+
+write_rds(combined, file="./outs/1_seurat.merge.rds")
 }
+
+if(FALSE){
+### add meta dta
+meta <- map_dfr(expNames, function(ii){
+   run <- folders[ii]
+   fn <- paste(run, "outs/singlecell.csv", sep="")
+   meta <- fread(fn)%>%filter(passed_filters>500)%>%mutate(barcode=paste(ii, barcode, sep="_"))
+   meta
+})
+
+x <- combined@meta.data
+x <- x%>%mutate(barcode=rownames(x))%>%left_join(meta)
+rownames(x) <- x$barcode
+combined <- AddMetaData(combined, x)
+
+###add the gene information to the object
+annotations <- GetGRangesFromEnsDb(ensdb=EnsDb.Hsapiens.v75)
+#seqlevelsStyle(annotations) <- "1000"
+genome(annotations) <- "hg19"
+Annotation(combined) <- annotations
+
+combined <- combined%>%NucleosomeSignal()%>%TSSEnrichment(fast=F)
+combined <- NucleosomeSignal(combined)
+#combined <- TSSEnrichment(combined, fast=F)
+combined$pct_reads_in_peaks <- combined$peak_region_fragments/combined$passed_filters*100
+combined$blacklist_ratio <- combined$blacklist_region_fragments/combined$peak_region_fragments
+
+opfn <- "./outs/1_seurat.merge.rds"
+write_rds(combined, file=opfn)            
+}
+
+ 
+###
+### Summary
+###
+atac <- read_rds("./outs/1_seurat.merge.rds")
+atac$high.tss <- ifelse(atac$TSS.enrichment>2, "High", "Low")
+
+fig0 <- TSSPlot(atac, group.by="high.tss")+
+        NoLegend()+
+        theme(plot.title=element_text(hjust=0.5))        
+figfn <- "./outs/Figure1.tss.png"
+png(figfn, width=500, height=400, res=120)
+print(fig0)
+dev.off() 
+
+##
+atac$nucleosome_group <- ifelse(atac$nucleosome_signal>4, "NS > 4", "NS < 4")
+fig1 <- FragmentHistogram(object=atac, group.by = "nucleosome_group")
+figfn <- "./outs/Figure2.fragment.png"
+png(figfn, width=500, height=400, res=120)
+print(fig1)
+dev.off()
+
+###
+fig2 <- VlnPlot(object=atac,
+                features=c("pct_reads_in_peaks", "TSS.enrichment", "nucleosome_signal"),
+                pt.size=0.1, ncol=3)
+figfn <- "./outs/Figure3.vlnplot.png"
+png(figfn, width=800, height=400, res=120)
+print(fig2)
+dev.off()
+
 
 
