@@ -20,7 +20,7 @@ names(folders) <- expNames
 
 
 ###
-### 2, creating a common peak set
+### 2, creating a common peak set from filtered peak.bed files
 if(FALSE){
 expNames <- names(folders)
 peaks <- lapply(expNames, function(ii){
@@ -43,18 +43,19 @@ write_rds(combined.peaks, file="./outs/combined.peaks.rds")
 if(FALSE){
 
 ### read ATAC function
-readATAC <- function(run, peaks, threshold=500){
+readATAC <- function(run, peaks){
 
 ### load metadata
-   metafn <- paste(run, "outs/singlecell.csv", sep="")
-   meta <- fread(metafn)%>%filter(passed_filters>threshold)
-
-### create fragment object
+### extract filtered barcodes from cell ranger
+   metafn <- paste(run, "outs/filtered_peak_bc_matrix.csv", sep="")
+   meta <- fread(metafn, header=F)
+                                                                         
    fragfn <- paste(run, "outs/fragments.tsv.gz", sep="")
-   frags <- CreateFragmentObject(path=fragfn, cells=meta$barcode)
+### create fragment object
+   frags <- CreateFragmentObject(path=fragfn, cells=meta$V1)
 
 ### quantify peaks
-   counts <- FeatureMatrix(fragments=frags, features=peaks, cells=meta$barcode)
+   counts <- FeatureMatrix(fragments=frags, features=peaks, cells=meta$V1)
 
 ### create a seurat object
    assay <- CreateChromatinAssay(counts, fragments=frags)
@@ -69,7 +70,7 @@ combined.peaks <- read_rds("./outs/combined.peaks.rds")
 expNames <- names(folders)
 atac_ls <- future_map(expNames, function(ii){
    cat(ii,"\n")
-   atac <- readATAC(run=folders[ii], peaks=combined.peaks, threshold=500)
+   atac <- readATAC(run=folders[ii], peaks=combined.peaks)
    atac <- RenameCells(atac, add.cell.id=ii)
    atac
 })
@@ -80,12 +81,14 @@ combined <- merge(atac_ls[[1]], atac_ls[-1], project="sc-atac")
 write_rds(combined, file="./outs/1_seurat.merge.rds")
 }
 
+### Add meta data
 if(FALSE){
-### add meta dta
+
+### read meta data across 10 experiments
 meta <- map_dfr(expNames, function(ii){
    run <- folders[ii]
    fn <- paste(run, "outs/singlecell.csv", sep="")
-   meta <- fread(fn)%>%filter(passed_filters>500)%>%mutate(barcode=paste(ii, barcode, sep="_"))
+   meta <- fread(fn)%>%mutate(barcode=paste(ii, barcode, sep="_"))
    meta
 })
 
@@ -110,10 +113,13 @@ opfn <- "./outs/1_seurat.merge.rds"
 write_rds(combined, file=opfn)            
 }
 
+###
+###
+ 
  
 ###
 ### Summary
-###
+if(FALSE){
 atac <- read_rds("./outs/1_seurat.merge.rds")
 atac$high.tss <- ifelse(atac$TSS.enrichment>2, "High", "Low")
 
@@ -135,12 +141,20 @@ dev.off()
 
 ###
 fig2 <- VlnPlot(object=atac,
-                features=c("pct_reads_in_peaks", "TSS.enrichment", "nucleosome_signal"),
-                pt.size=0.1, ncol=3)
+                features=c("pct_reads_in_peaks", "peak_region_fragments", "TSS.enrichment", 
+                           "blacklist_ratio", "nucleosome_signal"),
+                pt.size=0,
+                ncol=3)&
+        theme_bw()+
+        theme(axis.title=element_blank(),
+              axis.text.x=element_blank(),
+              legend.position="none",
+              plot.title=element_text(hjust=0.5,size=10))
 figfn <- "./outs/Figure3.vlnplot.png"
-png(figfn, width=800, height=400, res=120)
+png(figfn, width=700, height=500, res=120)
 print(fig2)
 dev.off()
+}##
 
 
 
