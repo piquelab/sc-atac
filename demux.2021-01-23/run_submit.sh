@@ -4,7 +4,7 @@ cd /nfs/rprdata/julong/sc-atac/demux.2021-01-23
 
 #ls ../count.SCAIP.2021-01-14 |grep '^SCAIP' |sort >libList.txt
 # mkdir ./demuxOut/
-cat libList.txt |head -1 | \
+cat libList.txt | head -1 | \
 while read sample;
 do
 echo ${sample}
