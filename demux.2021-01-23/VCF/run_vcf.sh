@@ -34,7 +34,7 @@ bcftools view SCAIP6.posG100.AL.vcf.gz -S ../../sample6.id --threads 2 -Oz -o sa
 ## MAF
 bcftools plugin fill-tags sample6.posG100.AL.vcf.gz -- -t 'AN,AC,AF,MAF'|bcftools view --threads 2 -Oz -o sample6.posG100.AF.vcf.gz 
 ## filter by MAF
-bcftools view sample6.posG100.AF.vcf.gz -i 'INFO/MAF>0.01' --threads 10 -Oz -o SCAIP6.posG100.MAF001.vcf.gz
+bcftools view sample6.posG100.AF.vcf.gz -i 'INFO/MAF>0.05' --threads 10 -Oz -o sample6.posG100.MAF005.vcf.gz
 #bcftools query sample6.posG100.AF.vcf.gz -i 'INFO/MAF>0.1' -f '%CHROM\t%POS\n'|wc -l
 
 
@@ -71,5 +71,6 @@ bcftools view sample6.posG100.AF.vcf.gz -i 'INFO/MAF>0.01' --threads 10 -Oz -o S
 #bcftools query SCAIP-ALL.1-6.merge.vcf.gz -f '%CHROM\t%POS\t%INFO/DP\n'|bgzip > zzz.infor.txt.gz &
 #bcftools query SCAIP-ALL.1-6.reheader.vcf.gz -f '%CHROM\t%POS\t%INFO/MAF\n'|bgzip > zzz.infor.txt.gz &
 #zcat SCAIP-ALL.1-6.reheader.vcf.gz|sed '2p'
+#samtools idxstats bamfile | cut -f 1 |head
 
 #bcftools query SCAIP-ALL.1-6.posG100.reheaderMAF.vcf.gz -f '%CHROM\t%POS\n'|wc -l &

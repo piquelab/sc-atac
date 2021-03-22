@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -q primary
 ##SBATCH --partition=erprp
-#SBATCH --mem=300G
-#SBATCH --time=6-01:00:00
+#SBATCH --mem=500G
+#SBATCH --time=30-00:00:00
 #SBATCH -N 1-1
 #SBATCH -n 1
 

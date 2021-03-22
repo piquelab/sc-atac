@@ -47,7 +47,7 @@ readATAC <- function(run, peaks){
 
 ### load metadata
 ### extract filtered barcodes from cell ranger
-   metafn <- paste(run, "outs/filtered_peak_bc_matrix.csv", sep="")
+   metafn <- paste(run, "outs/filtered_peak_bc_matrix/barcodes.tsv", sep="")
    meta <- fread(metafn, header=F)
                                                                          
    fragfn <- paste(run, "outs/fragments.tsv.gz", sep="")
@@ -84,6 +84,8 @@ write_rds(combined, file="./outs/1_seurat.merge.rds")
 ### Add meta data
 if(FALSE){
 
+combined <- read_rds("./outs/1_seurat.merge.rds")
+
 ### read meta data across 10 experiments
 meta <- map_dfr(expNames, function(ii){
    run <- folders[ii]
@@ -119,7 +121,7 @@ write_rds(combined, file=opfn)
  
 ###
 ### Summary
-if(FALSE){
+if(TRUE){
 atac <- read_rds("./outs/1_seurat.merge.rds")
 atac$high.tss <- ifelse(atac$TSS.enrichment>2, "High", "Low")
 
@@ -132,12 +134,12 @@ print(fig0)
 dev.off() 
 
 ##
-atac$nucleosome_group <- ifelse(atac$nucleosome_signal>4, "NS > 4", "NS < 4")
-fig1 <- FragmentHistogram(object=atac, group.by = "nucleosome_group")
-figfn <- "./outs/Figure2.fragment.png"
-png(figfn, width=500, height=400, res=120)
-print(fig1)
-dev.off()
+#atac$nucleosome_group <- ifelse(atac$nucleosome_signal>4, "NS > 4", "NS < 4")
+#fig1 <- FragmentHistogram(object=atac, group.by = "nucleosome_group")
+#figfn <- "./outs/Figure2.fragment.png"
+#png(figfn, width=500, height=400, res=120)
+#print(fig1)
+#dev.off()
 
 ###
 fig2 <- VlnPlot(object=atac,
