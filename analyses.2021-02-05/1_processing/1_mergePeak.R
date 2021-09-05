@@ -1,15 +1,34 @@
-#module load R/test_4.0.3
+#module load R/test_4.1
 ###
 #setwd("/nfs/rprdata/julong/sc-atac/analyses.2021-02-05/1_seurat")
-source("../LibraryPackage.R")
+library(tidyverse)
+## library(parallel)
+library(data.table)
+## library(purrr)
+library(GenomicRanges)
+library(Seurat)
+library(SeuratDisk)
+library(SeuratData)
+library(Signac)
+library(SeuratWrappers)
+## library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+## library(monocle3)
+###
+library(ggplot2)
+library(cowplot)
+library(RColorBrewer)
+library(viridis)
+theme_set(theme_grey())
 
-outdir <- "./outs/"
+outdir <- "./1_Merge.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 rm(list=ls())
 
-###
-### 1, generate folders
+###########################
+### 0, generate folders ###
+###########################
+
 basefolder <- "/nfs/rprdata/julong/sc-atac/count.SCAIP.2021-01-14/"
 expNames <- dir(basefolder,"^SCAIP*")
 folders <- paste0(basefolder, expNames, "/", sep="")
@@ -19,9 +38,10 @@ expNames <- expNames[ind]
 names(folders) <- expNames
 
 
-###
-### 2, creating a common peak set from filtered peak.bed files
-if(FALSE){
+##################################################################
+### 1, creating a common peak set from filtered peak.bed files ###
+##################################################################
+
 expNames <- names(folders)
 peaks <- lapply(expNames, function(ii){
    fn <- paste(folders[ii], "outs/filtered_peak_bc_matrix/peaks.bed", sep="")
@@ -34,15 +54,13 @@ combined.peaks <- GenomicRanges::reduce(x=x2)
 ###
 peakwidths <- GenomicRanges::width(combined.peaks)
 combined.peaks <- combined.peaks[peakwidths<10000&peakwidths>20]
-write_rds(combined.peaks, file="./outs/combined.peaks.rds")
-}
+write_rds(combined.peaks, file="./1_Merge.outs/0_combined.peaks.rds")
 
 
 ###
 ### 3, combined seurat object
-if(FALSE){
 
-### read ATAC function
+### readATAC, quantify peaks and create ATAC object
 readATAC <- function(run, peaks){
 
 ### load metadata
@@ -64,9 +82,10 @@ readATAC <- function(run, peaks){
    atac 
 }###
 
+
 ###
 ### merge multiple objects
-combined.peaks <- read_rds("./outs/combined.peaks.rds")
+combined.peaks <- read_rds("./1_Merge.outs/0_combined.peaks.rds")
 expNames <- names(folders)
 atac_ls <- future_map(expNames, function(ii){
    cat(ii,"\n")
@@ -78,13 +97,11 @@ atac_ls <- future_map(expNames, function(ii){
 
 combined <- merge(atac_ls[[1]], atac_ls[-1], project="sc-atac")
 
-write_rds(combined, file="./outs/1_seurat.merge.rds")
-}
+write_rds(combined, file="./1_Merge.outs/1_seurat.merge.rds")
+
 
 ### Add meta data
-if(FALSE){
-
-combined <- read_rds("./outs/1_seurat.merge.rds")
+combined <- read_rds("./1_Merge.outs/1_seurat.merge.rds")
 
 ### read meta data across 10 experiments
 meta <- map_dfr(expNames, function(ii){
@@ -111,24 +128,24 @@ combined <- NucleosomeSignal(combined)
 combined$pct_reads_in_peaks <- combined$peak_region_fragments/combined$passed_filters*100
 combined$blacklist_ratio <- combined$blacklist_region_fragments/combined$peak_region_fragments
 
-opfn <- "./outs/1_seurat.merge.rds"
+opfn <- "./1_Merge.outs/1_seurat.merge.rds"
 write_rds(combined, file=opfn)            
-}
 
 ###
 ###
  
  
-###
-### Summary
-if(TRUE){
-atac <- read_rds("./outs/1_seurat.merge.rds")
+###############
+### Summary ###
+###############
+
+atac <- read_rds("./1_Merge.outs/1_seurat.merge.rds")
 atac$high.tss <- ifelse(atac$TSS.enrichment>2, "High", "Low")
 
 fig0 <- TSSPlot(atac, group.by="high.tss")+
         NoLegend()+
         theme(plot.title=element_text(hjust=0.5))        
-figfn <- "./outs/Figure1.tss.png"
+figfn <- "./1_Merge.outs/Figure1.tss.png"
 png(figfn, width=500, height=400, res=120)
 print(fig0)
 dev.off() 
@@ -152,11 +169,10 @@ fig2 <- VlnPlot(object=atac,
               axis.text.x=element_blank(),
               legend.position="none",
               plot.title=element_text(hjust=0.5,size=10))
-figfn <- "./outs/Figure3.vlnplot.png"
+figfn <- "./1_Merge.outs/Figure3.vlnplot.png"
 png(figfn, width=700, height=500, res=120)
 print(fig2)
 dev.off()
-}##
 
 
 
