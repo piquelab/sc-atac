@@ -309,6 +309,47 @@ png(figfn, width=600, height=600, res=120)
 print(p2)
 dev.off()
 
+
+########################################################
+### UMAP of cell type-related marker gene expression ###
+########################################################
+
+rm(list=ls())
+
+fn <- "./3_Clustering.outs/2_seurat.RNA.rds"
+sc <- read_rds(fn)
+
+x0 <- c("MS4A1", "CD79A", "MS4A7", "CD14", "GNLY", "NKG7", "CD3D", "CD8A")
+  ## "IL7R", "CCR7", "S100A4", "CD8A", "TNFRSF18", "ID3")
+MCls <- rep(c("B cells", "Monocytes", "NK cells", "T cells"), each=2)
+anno <- data.frame(MCls=MCls, symbol=x0)
+
+#### plot
+figs_ls <- lapply(1:nrow(anno), function(i){
+   oneMCl <- anno$MCls[i]
+   gene <- anno$symbol[i]
+   fig0 <- FeaturePlot(sc, features=gene)+
+      scale_color_gradient(gene, low="lightgrey", high="blue")+
+      ggtitle(oneMCl)+
+      theme_bw()+
+      theme(axis.text=element_text(size=6),
+            axis.title=element_text(size=8),
+            legend.title=element_text(size=6),
+            legend.key.size=grid::unit(0.4,"lines"),
+            legend.text=element_text(size=6),
+            plot.title=element_text(size=8, hjust=0.5))
+   fig0
+})
+
+###
+figfn <- "./3_Clustering.outs/Figure3.3_RNA.feature.png"
+png(figfn, width=900, height=450, res=120)
+plot_grid(figs_ls[[1]], figs_ls[[3]], figs_ls[[5]], figs_ls[[7]],
+          figs_ls[[2]], figs_ls[[4]], figs_ls[[6]], figs_ls[[8]],
+   align="hv", nrow=2, ncol=4, byrow=T)
+dev.off()
+
+
 #### previous UMAP and cell type annotation
 ## sc <- read_rds("/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/5_IdenCelltype_output/4_SCAIP.MCls.Harmony.rds")
 ## sc2 <- subset(sc, subset=BATCH=="SCAIP6")
