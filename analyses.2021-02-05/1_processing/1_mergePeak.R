@@ -11,6 +11,8 @@ library(SeuratDisk)
 library(SeuratData)
 library(Signac)
 library(SeuratWrappers)
+library(SeuratObject)
+library(EnsDb.Hsapiens.v75)
 ## library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
 ## library(monocle3)
 ###
@@ -76,9 +78,9 @@ readATAC <- function(run, peaks){
    counts <- FeatureMatrix(fragments=frags, features=peaks, cells=meta$V1)
 
 ### create a seurat object
-   assay <- CreateChromatinAssay(counts, fragments=frags)
+   assay <- CreateChromatinAssay(counts,
+      sep=c(":", "-"), genome="hg19", fragments=frags)
    atac <- CreateSeuratObject(assay, assay="ATAC")
-
    atac 
 }###
 
@@ -87,10 +89,11 @@ readATAC <- function(run, peaks){
 ### merge multiple objects
 combined.peaks <- read_rds("./1_Merge.outs/0_combined.peaks.rds")
 expNames <- names(folders)
-atac_ls <- future_map(expNames, function(ii){
+atac_ls <- lapply(expNames, function(ii){
    cat(ii,"\n")
    atac <- readATAC(run=folders[ii], peaks=combined.peaks)
    atac <- RenameCells(atac, add.cell.id=ii)
+   atac <- RenameCells(atac, new.names=gsub("-1","",Cells(atac)))
    atac
 })
 ###
@@ -108,7 +111,7 @@ meta <- map_dfr(expNames, function(ii){
    run <- folders[ii]
    fn <- paste(run, "outs/singlecell.csv", sep="")
    meta <- fread(fn)%>%mutate(barcode=paste(ii, barcode, sep="_"))
-   meta
+   meta <- meta%>%mutate(barcode=gsub("-1", "", barcode))
 })
 
 x <- combined@meta.data
@@ -123,7 +126,7 @@ genome(annotations) <- "hg19"
 Annotation(combined) <- annotations
 
 combined <- combined%>%NucleosomeSignal()%>%TSSEnrichment(fast=F)
-combined <- NucleosomeSignal(combined)
+## combined <- NucleosomeSignal(combined)
 #combined <- TSSEnrichment(combined, fast=F)
 combined$pct_reads_in_peaks <- combined$peak_region_fragments/combined$passed_filters*100
 combined$blacklist_ratio <- combined$blacklist_region_fragments/combined$peak_region_fragments
