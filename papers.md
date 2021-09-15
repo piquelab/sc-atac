@@ -3,5 +3,6 @@
 - Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 - Molecular mechanisms in the regulation of adult neurogenesis during stress, https://www.nature.com/articles/nrn3855
 - Chromatin accessibility profiling methods, https://www.nature.com/articles/s43586-020-00008-9
+- Chromatin accessibility and the regulatory epigenome, https://www.nature.com/articles/s41576-018-0089-8
 #### tools
 - ArchR, https://www.archrproject.com/index.html
