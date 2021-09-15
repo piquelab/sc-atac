@@ -5,5 +5,6 @@
 - Chromatin accessibility profiling methods, https://www.nature.com/articles/s43586-020-00008-9
 - Chromatin accessibility and the regulatory epigenome, https://www.nature.com/articles/s41576-018-0089-8
 - Integration of ATAC-seq and RNA-seq identifies human alpha cell and beta cell signature genes, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4770267/
+- Single-cell epigenomic variability reveals functional cancer heterogeneity, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1133-7
 #### tools
 - ArchR, https://www.archrproject.com/index.html
