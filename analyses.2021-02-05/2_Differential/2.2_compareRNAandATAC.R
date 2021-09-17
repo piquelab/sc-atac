@@ -18,10 +18,10 @@ library(org.Hs.eg.db)
 library(annotables)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(EnsDb.Hsapiens.v75)
-library(ChIPseeker,lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(ChIPseeker, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
 ###
 library(ggplot2)
-library(cowplot,lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(cowplot, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
 library(grid)
 library(gridExtra)
 library(ggExtra)
@@ -36,6 +36,11 @@ outdir <- "./2.2_compareRNAandATAC.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F)
 
 
+########################
+### annotation peaks ###
+########################
+
+###
 ### annotation database
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 edb <- EnsDb.Hsapiens.v75
@@ -52,6 +57,7 @@ write_rds(peakAnno, opfn)
 ## peakAnno <- peakAnno%>%dplyr::select(gene_name,query_region)
 
 
+###
 ### peak annotation from ChIPseeker
 x <- as.data.frame(granges(atac))%>%
    mutate(seqnames=paste("chr",seqnames,sep=""))
@@ -64,18 +70,35 @@ write_rds(peakAnno, opfn)
 
 
 ###
-### compare signac and ChIPseeker 
+### compare signac and ChIPseeker
+### compare the closest genes
 x1 <- read_rds("./2.2_compareRNAandATAC.outs/1_annot.signac.rds")
 x1 <- x1%>%dplyr::rename("peak_region"="query_region")%>%
   dplyr::select(peak_region, gene_id)  
     
 x2 <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
-   as.data.frame(peakAnno)%>%
+   as.data.frame()%>%
    mutate(chr=gsub("chr","",seqnames),
           peak_region=paste(chr,start,end,sep="-"))%>%
-  dplyr::select(peak_region,geneId)
+  dplyr::select(peak_region, geneId)
 
-x <- x1%>%left_join(x2,by="peak_region")
+x <- x1%>%left_join(x2, by="peak_region")
+
+### compare the genes around regions
+x2 <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
+   as.data.frame()%>%
+   mutate(chr=gsub("chr","",seqnames),
+          peak_region=paste(chr,start,end,sep="-"))%>%
+   dplyr::select(peak_region, flank_geneIds)
+x <- x1%>%left_join(x2, by="peak_region")
+
+geneList <- str_split(x$flank_geneIds, ";")
+ii <- map_dbl(1:length(geneList), function(i){
+  gene0 <- as.character(x[i, "gene_id"])
+  x <- ifelse(gene0%in%geneList[[i]], 1, 0)
+  x
+})
+
 
 
 #################################################
@@ -147,7 +170,7 @@ peakAnno <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")
 
 ##
 figfn <- "./2.2_compareRNAandATAC.outs/Figure2.1_annot.pie.png"
-png(figfn)
+png(figfn, width=480, height=320)
 plotAnnoPie(peakAnno)
 dev.off()
 
