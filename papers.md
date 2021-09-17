@@ -9,3 +9,4 @@
 - From reads to insight: a hitchhiker’s guide to ATAC-seq data analysis, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-1929-3#Sec6
 #### tools
 - ArchR, https://www.archrproject.com/index.html
+- computational genomics with R, https://compgenomr.github.io/book/
