@@ -10,7 +10,7 @@
 - Human and rat skeletal muscle single-nuclei multi-omic integrative analyses nominate causal cell types, regulatory elements, and SNPs for complex traits, https://www.biorxiv.org/content/10.1101/2020.07.01.183004v1
 - Cardiac cell type–specific gene regulatory programs and disease risk association, https://www.science.org/doi/10.1126/sciadv.abf1444
 - Genetic effects on liver chromatin accessibility identify disease regulatory variants, https://www.sciencedirect.com/science/article/abs/pii/S0002929721001853
-- 
+- Genetic variant effects on gene expression in human pancreatic islets and their implications for T2D, https://www.nature.com/articles/s41467-020-18581-8
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
