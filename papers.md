@@ -7,6 +7,7 @@
 - Integration of ATAC-seq and RNA-seq identifies human alpha cell and beta cell signature genes, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4770267/
 - Single-cell epigenomic variability reveals functional cancer heterogeneity, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1133-7
 - From reads to insight: a hitchhiker’s guide to ATAC-seq data analysis, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-1929-3#Sec6
+- Human and rat skeletal muscle single-nuclei multi-omic integrative analyses nominate causal cell types, regulatory elements, and SNPs for complex traits, https://www.biorxiv.org/content/10.1101/2020.07.01.183004v1
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
