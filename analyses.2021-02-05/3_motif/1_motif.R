@@ -1,0 +1,405 @@
+###
+library(tidyverse)
+library(Seurat)
+library(SeuratDisk)
+library(SeuratData)
+library(SeuratObject)
+library(Signac)
+library(SeuratWrappers)
+library(SeuratData)
+
+library(JASPAR2020)
+library(TFBSTools)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(BSgenome.Hsapiens.1000genomes.hs37d5, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(ChIPseeker, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+###
+library(ggplot2)
+library(cowplot, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(grid)
+library(gridExtra)
+library(ggExtra)
+library(RColorBrewer)
+library(ggsci)
+library(viridis)
+library(ComplexHeatmap)
+library(circlize)
+theme_set(theme_grey())
+
+
+outdir <- "./1_motif.outs/"
+if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
+
+
+###########################
+### obtain motif object ###
+###########################
+
+pfm <- getMatrixSet(x=JASPAR2020,
+   opts=list(species=9606, all_version=F))
+
+##
+atac <- read_rds("../1_processing/5.1_reCallPeak.outs/3_scATAC.annot.rds")
+
+## anno <- GetGRangesFromEnsDb(ensdb=EnsDb.Hsapiens.v75)
+## seqlevelsStyle(anno) <- "UCSC"
+## genome(anno) <- "hg19"
+## Annotation(atac) <- anno
+
+atac <- AddMotifs(object=atac,
+   genome=BSgenome.Hsapiens.1000genomes.hs37d5,
+   pfm=pfm)
+
+###
+opfn <- "./1_motif.outs/1_scATAC.motif.rds"
+write_rds(atac, opfn)
+
+
+#####################################
+### enrichment analysis for motif ###
+#####################################
+
+rm(list=ls())
+
+### motif
+fn <- "./1_motif.outs/1_scATAC.motif.rds" 
+atac <- read_rds(fn)
+## motif <- Motifs(atac)
+## pfm <- GetMotifData(object=motif, slot="pwm")
+## motif <- SetMotifData(object=motif, slot="pwm", new.data=pfm)
+## differential peaks
+fn <- "../2_Differential/1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+resDP <- read_rds(fn)%>%as.data.frame()
+
+### fisher test
+cal.fisher <- function(df){
+  ###  
+  resfisher <- map_dfr(1:nrow(df),function(i){  
+     dmat <- matrix(as.numeric(df[i,]),2,2)
+     colnames(dmat) <- c("interest", "not.interest")
+     rownames(dmat) <- c("in.motif", "not.motif")
+     res <- fisher.test(dmat, alternative="greater")
+     res2 <- data.frame(odds=res$estimate, pval.fisher=res$p.value)
+     res2
+  })
+  resfisher
+}
+
+    
+MCls <- rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), each=4)
+contrast <- rep(c("LPS", "LPS-DEX", "PHA", "PHA-DEX"), times=4)
+dataset <- data.frame(MCls=MCls, contrast=contrast)
+
+###enrichment motif analysis
+enriched.motif <- lapply(1:16, function(i){
+###
+   cell0 <- dataset[i,1]
+   contrast0 <- dataset[i,2]
+   cat(i, cell0, contrast0, "\n") 
+###
+   res2 <- resDP%>%dplyr::filter(MCls==cell0, contrast==contrast0)
+   top.DP <- res2%>%
+       dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)%>%
+       dplyr::pull(gene)%>%as.character()
+   bg.DP <- res2%>%dplyr::pull(gene)%>%as.character() 
+   n.interest <- length(top.DP)
+   n.not <- length(bg.DP)-n.interest
+    
+   if(n.interest>0){
+     enrich2 <- FindMotifs(
+        object=atac,
+        features=top.DP,
+        background=bg.DP)
+     df <- data.frame("interest.in.motif"=enrich2$observed,
+                     "interest.not.motif"=n.interest-enrich2$observed,
+                     "not.interest.in.motif"=enrich2$background-enrich2$observed)
+     df <- df%>%mutate("not.interest.not.motif"=n.not-not.interest.in.motif)
+     fisher <- cal.fisher(df)
+     enrich2 <- cbind(enrich2,fisher)
+     enrich2$qvalue.hyper <- p.adjust(enrich2$pvalue,"BH")
+     enrich2$qvalue.fisher <- p.adjust(enrich2$pval.fisher,"BH")
+     enrich2$MCls <- cell0
+     enrich2$contrast <- contrast0
+   }else{
+     enrich2 <- NA   
+   }
+   enrich2 
+})
+
+enriched.motif <- enriched.motif[!is.na(enriched.motif)]
+enriched.motif <- do.call(rbind,enriched.motif)
+
+opfn <- "./1_motif.outs/2_motif.enrich.rds"
+write_rds(enriched.motif, opfn)
+##
+## fn <- "../2_Differential/2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds"
+## peakAnno <- read_rds(fn)%>%
+##    as.data.frame()%>%
+##    mutate(chr=gsub("chr", "", seqnames),
+##                    peak_region=paste(chr,start,end,sep="-"))%>%
+##    dplyr::select(peak_region, geneId, SYMBOL, distanceToTSS)
+
+## ###
+## resDP2 <- resDP2%>%left_join(peakAnno, by=c("gene"="peak_region"))
+
+## top.DP <- as.character(resDP2$gene)
+
+### test enrichment
+## build a set of background peaks
+## find peaks open in T cell
+## atac2 <- subset(atac, subset=MCls=="Tcell")
+## cell0 <- Cells(atac2)
+## open.peaks <- AccessiblePeaks(atac, cells=cell0)
+## ## match the overall GC content in the peak set
+## meta.feature <- GetAssayData(atac, assay="ATAC", slot="meta.features")
+## peak.matched <- MatchRegionStats(
+##    meta.feature=meta.feature[open.peaks,],
+##    query.feature=meta.feature[top.DP,],
+##    n=15000)
+
+## ### test enrichment
+## enriched <- FindMotifs(
+##    object=atac,
+##    features=top.DP,
+##    background=peak.matched)
+
+##
+
+###
+### heatmap
+rm(list=ls())
+
+enrich <- read_rds("./1_motif.outs/2_motif.enrich.rds")
+enrich <- enrich%>%
+   drop_na(fold.enrichment)%>%
+   mutate(condition=paste(MCls, contrast, sep="_"))
+condition <- unique(enrich$condition)
+
+### build matrix for heatmap
+motif <- enrich$motif
+names(motif) <- enrich$motif.name
+motif <- motif[!duplicated(motif)]
+###
+mat <- lapply(condition, function(ii){
+   enrich2 <- enrich%>%dplyr::filter(condition==ii)
+   z <- enrich2$fold.enrichment
+   names(z) <- enrich2$motif
+   z[motif]
+})
+mat <- do.call(cbind, mat)
+colnames(mat) <- condition
+rownames(mat) <- motif
+
+###
+b <- as.vector(mat)
+b2 <- b[b>1&b<2.66]
+breaks <- c(seq(0,1,length.out=50),
+            quantile(b2, probs=seq(0, 1, length.out=49)), 38.93) 
+col_fun <-  colorRamp2(breaks,
+   colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(100))
+column_ha <- HeatmapAnnotation(
+    celltype=c(rep("Bcell",each=3),rep(c("Monocyte", "NKcell", "Tcell"),each=4)),
+    treatment=c("LPS-DEX","PHA","PHA-DEX",
+               rep(c("LPS", "LPS-DEX", "PHA", "PHA-DEX"),times=3)),
+    col=list(celltype=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+                    "NKcell"="#aa4b56", "Tcell"="#ffaa00"),
+             treatment=c("LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
+                        "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")))
+fig <- Heatmap(mat, col=col_fun,
+   cluster_rows=T, cluster_columns=T,
+   top_annotation=column_ha,
+   heatmap_legend_param=list(title="fold.enrichment",
+      title_gp=gpar(fontsize=10),
+      labels_gp=gpar(fontsize=10)),
+   show_row_names=F, show_column_names=T,
+   column_names_gp=gpar(fontsize=10.5),
+   raster_device="png")
+
+figfn <- "./1_motif.outs/Figure1.1_heatmap.png"
+png(figfn, height=800, width=600, res=120)
+set.seed(0)
+fig <- draw(fig)
+dev.off()
+
+   
+
+enrich%>%mutate(LFC=log2(fold.enrichment))%>%
+   dplyr::filter(qvalue.hyper<0.1, LFC>0.5)%>%
+   group_by(condition)%>%summarise(ny=n(),.groups="drop")
+
+
+
+############################################################
+### motif enrichment analysis directionally, up and down ###
+############################################################
+
+fn <- "./1_motif.outs/1_scATAC.motif.rds" 
+atac <- read_rds(fn)
+## motif <- Motifs(atac)
+## pfm <- GetMotifData(object=motif, slot="pwm")
+## motif <- SetMotifData(object=motif, slot="pwm", new.data=pfm)
+## differential peaks
+fn <- "../2_Differential/1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+resDP <- read_rds(fn)%>%as.data.frame()%>%
+   mutate(direction=ifelse(estimate>0, 1, 0))
+
+### fisher test
+cal.fisher <- function(df){
+  ###  
+  resfisher <- map_dfr(1:nrow(df),function(i){  
+     dmat <- matrix(as.numeric(df[i,]),2,2)
+     colnames(dmat) <- c("interest", "not.interest")
+     rownames(dmat) <- c("in.motif", "not.motif")
+     res <- fisher.test(dmat, alternative="greater")
+     res2 <- data.frame(odds=res$estimate, pval.fisher=res$p.value)
+     res2
+  })
+  resfisher
+}
+
+    
+MCls <- rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), each=4)
+contrast <- rep(c("LPS", "LPS-DEX", "PHA", "PHA-DEX"), times=4)
+dataset <- data.frame(MCls=MCls, contrast=contrast)
+
+###enrichment motif analysis
+enriched.motif <- lapply(1:16, function(i){
+###
+   cell0 <- dataset[i,1]
+   contrast0 <- dataset[i,2]
+   cat(i, cell0, contrast0, "\n") 
+###
+   enrich <- lapply(c(0,1),function(ii){ 
+      res2 <- resDP%>%
+         dplyr::filter(MCls==cell0, contrast==contrast0)
+      top.DP <- res2%>%
+         dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5, direction==ii)%>%
+         dplyr::pull(gene)%>%as.character()
+      bg.DP <- res2%>%dplyr::pull(gene)%>%as.character() 
+      n.interest <- length(top.DP)
+      n.not <- length(bg.DP)-n.interest
+    
+     if(n.interest>5){
+        enrich2 <- FindMotifs(
+           object=atac,
+           features=top.DP,
+           background=bg.DP)
+        df <- data.frame("interest.in.motif"=enrich2$observed,
+           "interest.not.motif"=n.interest-enrich2$observed,
+           "not.interest.in.motif"=enrich2$background-enrich2$observed)
+        df <- df%>%mutate("not.interest.not.motif"=n.not-not.interest.in.motif)
+        fisher <- cal.fisher(df)
+        enrich2 <- cbind(enrich2,fisher)
+        enrich2$qvalue.hyper <- p.adjust(enrich2$pvalue,"BH")
+        enrich2$qvalue.fisher <- p.adjust(enrich2$pval.fisher,"BH")
+        enrich2$MCls <- cell0
+        enrich2$contrast <- contrast0
+        enrich2$direction <- ii
+      }else{
+        enrich2 <- NA   
+      }
+      enrich2
+   })
+    
+   ##return results 
+   if ( sum(is.na(enrich))==2){
+      enrich <- NA
+   }else{   
+      enrich <-enrich[!is.na(enrich)]
+      enrich <- do.call(rbind,enrich)
+   }   
+   enrich 
+})
+
+enriched.motif <- enriched.motif[!is.na(enriched.motif)]
+enriched.motif <- do.call(rbind,enriched.motif)
+
+opfn <- "./1_motif.outs/3_motif.enrich.direction.rds"
+write_rds(enriched.motif, opfn)
+
+
+
+###
+###
+### heatmap
+rm(list=ls())
+
+direction2 <- c("0"="Down","1"="Up")
+enrich <- read_rds("./1_motif.outs/3_motif.enrich.direction.rds")
+enrich <- enrich%>%
+   drop_na(fold.enrichment)%>%
+   mutate(dir2=direction2[as.character(direction)],
+          condition=paste(MCls, contrast, dir2, sep="_"))
+condition <- unique(enrich$condition)
+
+### build matrix for heatmap
+motif <- enrich$motif
+names(motif) <- enrich$motif.name
+motif <- motif[!duplicated(motif)]
+###
+mat <- lapply(condition, function(ii){
+   enrich2 <- enrich%>%dplyr::filter(condition==ii)
+   z <- enrich2$fold.enrichment
+   names(z) <- enrich2$motif
+   z[motif]
+})
+mat <- do.call(cbind, mat)
+colnames(mat) <- condition
+rownames(mat) <- motif
+
+###
+b <- as.vector(mat)
+b2 <- b[b>1&b<2.62]
+breaks <- c(seq(0, 1, length.out=50),
+            quantile(b2, probs=seq(0, 1, length.out=49)),7.71) 
+col_fun <-  colorRamp2(breaks,
+   colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(100))
+column_ha <- HeatmapAnnotation(
+    celltype=gsub("_.*", "", condition),
+    treatment=gsub(".*cell_|.*cyte_|_(D|U).*", "", condition),
+    col=list(celltype=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+                    "NKcell"="#aa4b56", "Tcell"="#ffaa00"),
+             treatment=c("LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
+                        "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")))
+fig <- Heatmap(mat, col=col_fun,
+   cluster_rows=T, cluster_columns=F,
+   top_annotation=column_ha,
+   heatmap_legend_param=list(title="fold.enrichment",
+      title_gp=gpar(fontsize=10),
+      labels_gp=gpar(fontsize=10)),
+   show_row_names=F, show_column_names=T,
+   column_names_gp=gpar(fontsize=10),
+   raster_device="png")
+
+figfn <- "./1_motif.outs/Figure3.1_heatmap.png"
+png(figfn, height=800, width=700, res=120)
+set.seed(0)
+fig <- draw(fig)
+dev.off()
+
+   
+
+enrich%>%mutate(LFC=log2(fold.enrichment))%>%
+   dplyr::filter(qvalue.hyper<0.1, LFC>0.5)%>%
+   group_by(condition)%>%summarise(ny=n(),.groups="drop")
+
+
+
+
+
+###
+### motif example
+fn <- "./1_motif.outs/1_scATAC.motif.rds" 
+atac <- read_rds(fn)
+motif <- Motifs(atac)
+
+example <- c("MA0137.3", "MA0517.1", "MA0144.2",
+   "MA0105.4", "MA0778.1",
+   "MA0099.3", "MA1126.1", "MA1134.1", "MA1141.1")
+fig <- MotifPlot(object=atac,motifs=example, facet="wrap",ncol=3,nrow=3)
+figfn <- "./1_motif.outs/Figure1.2_motif.example.png"
+png(figfn, width=800, height=600,res=120)
+print(fig)
+dev.off()
+###
+### example motif
