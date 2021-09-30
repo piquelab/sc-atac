@@ -11,6 +11,7 @@
 - Cardiac cell type–specific gene regulatory programs and disease risk association, https://www.science.org/doi/10.1126/sciadv.abf1444
 - Genetic effects on liver chromatin accessibility identify disease regulatory variants, https://www.sciencedirect.com/science/article/abs/pii/S0002929721001853
 - Genetic variant effects on gene expression in human pancreatic islets and their implications for T2D, https://www.nature.com/articles/s41467-020-18581-8
+- chromVAR: inferring transcription-factor-associated accessibility from single-cell epigenomic data, https://www.nature.com/articles/nmeth.4401
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
