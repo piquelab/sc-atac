@@ -12,6 +12,7 @@
 - Genetic effects on liver chromatin accessibility identify disease regulatory variants, https://www.sciencedirect.com/science/article/abs/pii/S0002929721001853
 - Genetic variant effects on gene expression in human pancreatic islets and their implications for T2D, https://www.nature.com/articles/s41467-020-18581-8
 - chromVAR: inferring transcription-factor-associated accessibility from single-cell epigenomic data, https://www.nature.com/articles/nmeth.4401
+- Quantification of Differential Transcription Factor Activity and Multiomics-Based Classification into Activators and Repressors: diffTF, https://www.sciencedirect.com/science/article/pii/S2211124719314391?via%3Dihub
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
