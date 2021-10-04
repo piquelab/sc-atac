@@ -36,7 +36,7 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 ###########################
 
 pfm <- getMatrixSet(x=JASPAR2020,
-   opts=list(species=9606, all_version=F))
+v   opts=list(species=9606, all_version=F))
 
 ##
 atac <- read_rds("../1_processing/5.1_reCallPeak.outs/3_scATAC.annot.rds")
@@ -53,6 +53,23 @@ atac <- AddMotifs(object=atac,
 ###
 opfn <- "./1_motif.outs/1_scATAC.motif.rds"
 write_rds(atac, opfn)
+
+
+###
+### motif example
+fn <- "./1_motif.outs/1_scATAC.motif.rds" 
+atac <- read_rds(fn)
+motif <- Motifs(atac)
+
+example <- c("MA0137.3", "MA0517.1", "MA0144.2",
+   "MA0105.4", "MA0778.1",
+   "MA0099.3", "MA1126.1", "MA1134.1", "MA1141.1")
+fig <- MotifPlot(object=atac,motifs=example, facet="wrap",ncol=3,nrow=3)
+figfn <- "./1_motif.outs/Figure1.2_motif.example.png"
+png(figfn, width=800, height=600,res=120)
+print(fig)
+dev.off()
+
 
 
 #####################################
@@ -384,22 +401,107 @@ enrich%>%mutate(LFC=log2(fold.enrichment))%>%
    group_by(condition)%>%summarise(ny=n(),.groups="drop")
 
 
+##############################
+### barplot enriched motif ###
+##############################
 
 
+direction2 <- c("0"="Down","1"="Up")
+enrich <- read_rds("./1_motif.outs/3_motif.enrich.direction.rds")
+enrich <- enrich%>%
+   drop_na(fold.enrichment)%>%
+   mutate(LFC=log2(fold.enrichment))
 
 ###
-### motif example
-fn <- "./1_motif.outs/1_scATAC.motif.rds" 
-atac <- read_rds(fn)
-motif <- Motifs(atac)
+res <- enrich%>%dplyr::filter(qvalue.hyper<0.1, fold.enrichment>1.41)
+sigs <- res%>%group_by(MCls, contrast, direction)%>%
+   summarise(ny=n(), .groups="drop")
+###
+sig4 <- sigs%>%mutate(ny2=ifelse(direction==0, -ny, ny))
 
-example <- c("MA0137.3", "MA0517.1", "MA0144.2",
-   "MA0105.4", "MA0778.1",
-   "MA0099.3", "MA1126.1", "MA1134.1", "MA1141.1")
-fig <- MotifPlot(object=atac,motifs=example, facet="wrap",ncol=3,nrow=3)
-figfn <- "./1_motif.outs/Figure1.2_motif.example.png"
-png(figfn, width=800, height=600,res=120)
-print(fig)
+breaks_value <- pretty(c(-600, 600), 5)
+
+p <- ggplot(sig4, aes(x=MCls, y=ny2))+
+   geom_bar(aes(fill=factor(MCls), alpha=factor(direction)), stat="identity")+
+   scale_fill_manual(values=c("Bcell"="#4daf4a",
+      "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00"))+
+   scale_alpha_manual(values=c("0"=0.5, "1"=1))+
+   geom_hline(yintercept=0, color="grey60")+
+   geom_text(aes(x=MCls, y=ny2, label=abs(ny2),
+      vjust=ifelse(direction==1, -0.2, 1.2)), size=3)+
+   scale_y_continuous("", breaks=breaks_value, limits=c(-600,650),
+                      labels=abs(breaks_value))+
+   facet_grid(~contrast,
+      labeller=labeller(contrast=c("LPS"="LPS","LPS-DEX"="LPS+DEX",
+                                   "PHA"="PHA", "PHA-DEX"="PHA+DEX")))+
+   theme_bw()+
+   theme(legend.position="none",
+         axis.title.x=element_blank(),
+         axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+###
+figfn <- "./1_motif.outs/Figure3.2_barplot.png"
+png(filename=figfn, width=800, height=400, pointsize=12, res=120)
+print(p)
 dev.off()
+                      
+
+
+#######################################
+### dot plots show motif enrichment ###
+#######################################
+
 ###
-### example motif
+#### label
+clst <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
+   rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
+clst <- paste(rep(clst,times=2), rep(c("Up","Down"), each=16), sep=".")
+###
+ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+clst2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+names(clst2) <- clst
+
+lab2 <- gsub("-", "+", clst)
+names(lab2) <- clst2 
+
+
+###
+### prepare data for plot
+enrich <- read_rds("./1_motif.outs/3_motif.enrich.direction.rds")
+drt2 <- c("0"="Down", "1"="Up")
+enrich <- enrich%>%mutate(direction2=drt2[as.character(direction)],
+   cluster=paste(contrast, MCls, direction2, sep="."),
+   newCluster=clst2[cluster])
+
+###
+enrich2 <- enrich%>%
+   dplyr::filter(fold.enrichment>1, qvalue.fisher<0.1)%>%
+   group_by(cluster)%>%
+   top_n(n=5, wt=odds)%>%ungroup()%>%as.data.frame()
+
+topmotif <- enrich2%>%dplyr::pull(motif)
+###
+
+enrich3 <- enrich%>%
+   dplyr::filter(motif%in%topmotif, fold.enrichment>1, qvalue.fisher<0.1)
+###
+p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
+   geom_point(aes(size=odds, colour=qvalue.fisher))+
+   scale_colour_gradient(name="FDR",
+      low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
+      guide=guide_colourbar(order=1))+
+   scale_size_binned("odds ratio",
+      guide=guide_bins(show.limits=T, axis=T,
+          axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
+      n.breaks=4)+
+   scale_x_discrete(labels=lab2)+ 
+   theme_bw()+
+   theme(axis.title=element_blank(),
+         axis.text.x=element_text(angle=60, hjust=1, size=10),
+         axis.text.y=element_text(size=7))
+###
+figfn <- "./1_motif.outs/Figure3.3_dotplot.png"
+png(figfn, width=1000, height=1000, res=120)
+print(p)
+dev.off()
+                       
