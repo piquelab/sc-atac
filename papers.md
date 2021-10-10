@@ -13,6 +13,8 @@
 - Genetic variant effects on gene expression in human pancreatic islets and their implications for T2D, https://www.nature.com/articles/s41467-020-18581-8
 - chromVAR: inferring transcription-factor-associated accessibility from single-cell epigenomic data, https://www.nature.com/articles/nmeth.4401
 - Quantification of Differential Transcription Factor Activity and Multiomics-Based Classification into Activators and Repressors: diffTF, https://www.sciencedirect.com/science/article/pii/S2211124719314391?via%3Dihub
+- Mechanisms of Glucocorticoid Receptor Action in Noninflammatory and Inflammatory Cells, https://www.atsjournals.org/doi/10.1513/pats.200402-005MS
+- Interpreting Coronary Artery Disease Risk Through Gene–Environment Interactions in Gene Regulation, https://academic.oup.com/genetics/article/213/2/651/5930613?login=true
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
