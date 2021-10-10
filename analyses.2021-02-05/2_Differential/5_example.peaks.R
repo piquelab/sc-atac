@@ -55,11 +55,32 @@ atac <- AddMetaData(atac,x)
 ### pick peaks containing motifs
 motif <- Motifs(atac)
 x <- motif@data
+
 motif.name <- c("NR3C1","NR3C2")
+## motif.name <- "RELA"
 motif.ID <- ConvertMotifID(motif, motif.name)
+
+## dir.create("./5_Example.outs/RELA/", showWarnings=F, recursive=F)
 
 peaks <- rownames(x)
 peak.sel <- peaks[x[,motif.ID[1]]==1] ## peak containing motifs
+
+
+################################################
+### Differential expressed or variable genes ###
+################################################
+
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/6_DEG.CelltypeNew_output/Filter2/2_meta.rds"
+resDE <- read_rds(fn)%>%as.data.frame()
+resDE2 <- resDE%>%dplyr::filter(qval<0.1,abs(beta)>0.5, MCls=="Tcell") 
+DEG <- unique(resDE2$rn)
+
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/3_phiNew.meta"
+resDV <- read.table(fn, header=T)%>%as.data.frame()
+resDV2 <- resDV%>%dplyr::filter(qval<0.1,abs(beta)>0.5, MCls=="Tcell") 
+DVG <- unique(resDV2$rn)
+
+
 
 
 #######################################################
@@ -67,11 +88,11 @@ peak.sel <- peaks[x[,motif.ID[1]]==1] ## peak containing motifs
 ### and annotate peaks using closest genes          ###
 #######################################################
 
-res <- read_rds("./1.2_DiffPeak.outs/2.0_DESeq.results.rds")%>%as.data.frame() 
-res2 <- res%>%
+res <- read_rds("./1.2_DiffPeak.outs/2.0_DESeq.results.rds")%>%
+    as.data.frame()%>%
    dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)
 
-res3 <- res2%>%dplyr::filter(gene%in%peak.sel)
+res2 <- res%>%dplyr::filter(gene%in%peak.sel)
 
 
 ### annotation
@@ -82,28 +103,31 @@ anno <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
 anno2 <- anno%>%dplyr::select(seqnames, start, end, geneId, SYMBOL, peak)
 
 ### 
-res3 <- res3%>%left_join(anno2, by=c("gene"="peak"))%>%
+res3 <- res2%>%left_join(anno2, by=c("gene"="peak"))%>%
    arrange(desc(abs(statistic)))
 
 res4 <- res3%>%dplyr::filter(MCls=="Tcell")
 
 res4 <- res4%>%mutate(rn=paste(MCls, contrast, geneId, sep="_"),
-   is_DEG=ifelse(rn%in%DEG, 1, 0))%>%dplyr::filter(is_DEG==1)
+   is_DEG=ifelse(rn%in%DEG, 1, 0), is_DVG=ifelse(rn%in%DVG,1,0))
 
+res5 <- res4%>%dplyr::filter(is_DEG==1,estimate<0)
 ###
-### plot specific region that was differentially expressed and contain motif and DEG 
+### plot specific region that was differentially expressed and contain motif and DEG
 atac2 <- subset(atac,subset=MCls=="Tcell")
-peak0 <- res4$gene[6]
+
+i <- 1
+peak0 <- res5$gene[1]
 ranges.show <- StringToGRanges(peak0)
 p <- CoveragePlot(atac2,
    region=peak0, region.highlight=ranges.show,
    group.by="treat",
-   extend.upstream=5e+03, extend.downstream=5e+03)&
+   extend.upstream=8e+03, extend.downstream=8e+03)&
    scale_fill_manual(values=c("CTRL"="#828282",
       "LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
       "PHA"="#a6cee3", "PHA-DEX"="#1f78b4"))    
 
-figfn <- paste("./5_Example.outs/Figure5.1_", peak0,
+figfn <- paste("./5_Example.outs/", motif.name, "/Figure", i, ".1_", peak0,
    ".coverage.png", sep="")
 png(figfn, width=580, height=400, res=120)
 print(p)
@@ -180,13 +204,13 @@ getData <- function(gene, datatype="ATAC"){
   }
 
   if ( datatype=="NB.phi"){
-     fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp10/1.2_Sel.Bx.RData"
+     fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp10/1.2_Sel.PhxNew.RData"
      load(fn)
-     rn <- gsub("\\..*", "", rownames(Bx))
-     rownames(Bx) <- rn
+     rn <- gsub("\\..*", "", rownames(PhxNew2))
+     rownames(PhxNew2) <- rn
 
-     X <- Bx[rn%in%gene,]
-     bti <- colnames(Bx)
+     X <- PhxNew2[rn%in%gene,]
+     bti <- colnames(PhxNew2)
      cvt <- str_split(bti, "_", simplify=T)
      cvt <- data.frame(rn=bti, MCls=cvt[,1], treats=gsub("-EtOH", "", cvt[,2]), sampleID=cvt[,3], Batch=cvt[,4])
      cvt$y <- log2(X)
@@ -204,7 +228,7 @@ lab1 <- c("LPS"="LPS", "LPS-DEX"="LPS+DEX",
 col1 <- c("LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
    "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")
 
-peak0 <- res4$gene[1]
+peak0 <- res5$gene[1]
 cvt <- getData(gene=peak0, datatype="ATAC")
 ###
 ###
@@ -224,15 +248,15 @@ p <- ggplot(cvt2,aes(x=factor(treats), y=yscale2, fill=treats))+
          legend.position="none")
 
 ###
-figfn <- paste("./5_Example.outs/Figure2.2_", peak0, ".boxplot.png", sep="")
+figfn <- paste("./5_Example.outs/", motif.name, "/Figure", i, ".2_", peak0, ".boxplot.png", sep="")
 png(figfn, width=480, height=420, res=120)
 print(p)
 dev.off()
 
 
 ### nearby gene expression
-gene0 <- res4$geneId[1]
-symbol0 <- res4$SYMBOL[1]
+gene0 <- res5$geneId[1]
+symbol0 <- res5$SYMBOL[1]
 cvt <- getData(gene=gene0, datatype="RNA")
 ###
 ###
@@ -252,7 +276,7 @@ p <- ggplot(cvt2,aes(x=factor(treats), y=yscale2, fill=treats))+
          legend.position="none")
 
 ###
-figfn <- paste("./5_Example.outs/Figure2.3_", symbol0, ".boxplot.png", sep="")
+figfn <- paste("./5_Example.outs/", motif.name, "/Figure", i, ".3_", symbol0, ".boxplot.png", sep="")
 png(figfn, width=480, height=420, res=120)
 print(p)
 dev.off()
@@ -260,7 +284,7 @@ dev.off()
 ### gene variability
 cvt <- getData(gene=gene0, datatype="NB.phi")
 cvt2 <- cvt%>%dplyr::filter(treats!="CTRL", MCls=="Tcell")
-p <- ggplot(cvt2,aes(x=factor(treats), y=y, fill=treats))+
+p <- ggplot(cvt2,aes(x=factor(treats), y=yscale2, fill=treats))+
    geom_boxplot(outlier.size=0.8)+
    ylab(bquote(~log[2]~"(Variability)"))+
    scale_y_continuous(expand=expansion(mult=c(0, 0.2)))+
@@ -275,20 +299,13 @@ p <- ggplot(cvt2,aes(x=factor(treats), y=y, fill=treats))+
          legend.position="none")
 
 ###
-figfn <- paste("./5_Example.outs/Figure2.4_", symbol0, ".va.boxplot.png", sep="")
+figfn <- paste("./5_Example.outs/", motif.name, "/Figure", i, ".4_", symbol0, ".va.boxplot.png", sep="")
 png(figfn, width=480, height=420, res=120)
 print(p)
 dev.off()
 
 
-####################################
-### Differential expressed genes ###
-####################################
-fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/6_DEG.CelltypeNew_output/Filter2/2_meta.rds"
-resDE <- read_rds(fn)%>%as.data.frame()
-resDE2 <- resDE%>%dplyr::filter(qval<0.1,abs(beta)>0.5, MCls=="Tcell") 
 
-DEG <- unique(resDE2$rn)
 ## geneID <- bitr(geneID=unique(resDE$gene), fromType="ENSEMBL", toType="SYMBOL",
 ##    OrgDb=org.Hs.eg.db)
 ## geneID <- geneID%>%dplyr::rename("gene"="ENSEMBL")
