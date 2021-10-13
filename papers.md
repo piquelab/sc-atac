@@ -16,6 +16,7 @@
 - Mechanisms of Glucocorticoid Receptor Action in Noninflammatory and Inflammatory Cells, https://www.atsjournals.org/doi/10.1513/pats.200402-005MS
 - Interpreting Coronary Artery Disease Risk Through Gene–Environment Interactions in Gene Regulation, https://academic.oup.com/genetics/article/213/2/651/5930613?login=true
 - Cicero Predicts cis-Regulatory DNA Interactions from Single-Cell Chromatin Accessibility Data, https://www.sciencedirect.com/science/article/pii/S1097276518305471?via%3Dihub
+- Mapping the genetic architecture of human traits to cell types in the kidney identifies mechanisms of disease and potential treatments, https://www.nature.com/articles/s41588-021-00909-9#Fig3
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
