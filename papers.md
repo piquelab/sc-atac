@@ -18,6 +18,7 @@
 - Cicero Predicts cis-Regulatory DNA Interactions from Single-Cell Chromatin Accessibility Data, https://www.sciencedirect.com/science/article/pii/S1097276518305471?via%3Dihub
 - Mapping the genetic architecture of human traits to cell types in the kidney identifies mechanisms of disease and potential treatments, https://www.nature.com/articles/s41588-021-00909-9#Fig3
 - Multimodal single-cell chromatin analysis with Signac, https://www.biorxiv.org/content/10.1101/2020.11.09.373613v1.full
+- Corticosterone pattern-dependent glucocorticoid receptor binding and transcriptional regulation within the liver, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009737
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
