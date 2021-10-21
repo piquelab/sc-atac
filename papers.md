@@ -19,6 +19,7 @@
 - Mapping the genetic architecture of human traits to cell types in the kidney identifies mechanisms of disease and potential treatments, https://www.nature.com/articles/s41588-021-00909-9#Fig3
 - Multimodal single-cell chromatin analysis with Signac, https://www.biorxiv.org/content/10.1101/2020.11.09.373613v1.full
 - Corticosterone pattern-dependent glucocorticoid receptor binding and transcriptional regulation within the liver, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009737
+- Asthma-associated genetic variants induce IL33 differential expression through an enhancer-blocking regulatory region, https://www.nature.com/articles/s41467-021-26347-z
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
