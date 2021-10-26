@@ -20,6 +20,7 @@
 - Multimodal single-cell chromatin analysis with Signac, https://www.biorxiv.org/content/10.1101/2020.11.09.373613v1.full
 - Corticosterone pattern-dependent glucocorticoid receptor binding and transcriptional regulation within the liver, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009737
 - Asthma-associated genetic variants induce IL33 differential expression through an enhancer-blocking regulatory region, https://www.nature.com/articles/s41467-021-26347-z
+- The GTEx Consortium atlas of genetic regulatory effects across human tissues, https://www.science.org/doi/full/10.1126/science.aaz1776
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
