@@ -46,25 +46,40 @@ cal.fisher <- function(df){
 
 
 ###
-enrich.motif <- function(atac, anno, resSig, resDP){
+enrich.motif <- function(atac, anno, feature, resSig, resDP){
     
+   ### filter annotation 
+   anno <- anno%>%
+      dplyr::filter(!grepl("chrX",seqnames),
+                    !grepl("chrY", seqnames))%>%
+      dplyr::select(seqnames, start, end, annotation, geneId, SYMBOL, peak)
+  ## if ( feature=="Promoter"){ 
+  ##    anno <- anno%>%dplyr::filter(grepl("Promoter", annotation))
+  ## }
+    
+   ### enrich analysis for condition separately
    comb <- sort(unique(resSig$comb))
    enriched.motif <- lapply(1:length(comb), function(i){
-###    
+##    
       ii <- comb[i]
       cat(i, ii, "\n") 
-###
+##
       ii0 <- gsub("_Up|_Down", "", ii) 
       resDP2 <- resDP%>%dplyr::filter(comb==ii0)
       bg.DP <- intersect(resDP2$peak, anno$peak)
 
-### peaks containing     
+### top peaks containing DEG or DVG    
       DEG <- resSig%>%
          dplyr::filter(comb==ii)%>%dplyr::pull(gene)%>%as.character()
-      top.DP <- anno%>%dplyr::filter(geneId%in%DEG)%>%dplyr::pull(peak)
+
+      top.DP <- anno%>%
+         dplyr::filter(geneId%in%DEG)%>%
+         dplyr::pull(peak)
+       
       n.in <- length(top.DP) 
       n.not <- length(bg.DP)-n.in
-    
+
+### enrichment analysis       
       if ( length(top.DP)>5){
          enrich2 <- FindMotifs(atac,
             features=top.DP,
@@ -183,17 +198,11 @@ print(p)
 dev.off()
 
 
-
 ##############################################################
 ###  motifs are enriched in DEG for up and down separately ###
 ##############################################################
 
 ##
-anno2 <- anno%>%
-   dplyr::filter(grepl("Promoter", annotation),
-                 !grepl("chrX",seqnames),
-                 !grepl("chrY", seqnames))%>%
-   dplyr::select(seqnames, start, end, annotation, geneId, SYMBOL, peak)
 
 ### results of DEG
 fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/6_DEG.CelltypeNew_output/Filter2/2_meta.rds"
@@ -203,15 +212,25 @@ resSig <- res%>%as.data.frame()%>%
           comb=paste(MCls, contrast, direction, sep="_"))%>% 
    dplyr::filter(qval<0.1, abs(beta)>0.5)
 ##
-## genetest <- unique(res$gene)
-## anno3 <- anno2%>%dplyr::filter(geneId%in%genetest)
-enrich <- enrich.motif(atac, anno2, resSig, resDP)
-write_rds(enrich, "./4_motif.outs/1.3_motif.DEG.direction.allpeaks.rds")
+genetest <- unique(res$gene)
+geneList <- str_split(anno$flank_geneIds, ";")
+is_gene <- map_lgl(geneList, ~any((.x)%in%genetest) )
+anno$is_gene <- is_gene 
+anno2 <- anno%>%dplyr::filter(is_gene)
+
+feature0 <- "Allpeaks"
+i <- 3
+enrich <- enrich.motif(atac, anno2, feature=feature0, resSig, resDP)
+opfn <- paste("./4_motif.outs/1.", i, "_motif.DEG.direction.", feature0, ".rds", sep="")
+write_rds(enrich, opfn)
 
 
 
-###
-### dot plots 
+#################
+### dot plots ###
+#################
+
+## re-label
 clust <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
                  rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
 clust <- paste(rep(clust,times=2), rep(c("Up","Down"), each=16), sep=".")
@@ -223,13 +242,18 @@ names(clust2) <- clust
 lab2 <- gsub("-", "+", clust)
 names(lab2) <- clust2
 
-enrich <- read_rds("./4_motif.outs/1.3_motif.DEG.direction.allpeaks.rds")%>%
+## read data for dot plots
+feature0 <- "Allpeaks"
+i <- 3
+fn <- paste("./4_motif.outs/1.", i, "_motif.DEG.direction.", feature0, ".rds", sep="")
+enrich <- read_rds(fn)%>%
    mutate(MCls=gsub("_.*", "", comb),
           contrast=gsub(".*[le]_|_[UD].*", "", comb),
           direction=gsub(".*_", "", comb),
           comb2=paste(contrast, MCls, direction, sep="."),
           newCluster=clust2[as.character(comb2)])%>%as.data.frame()
-         
+
+## top 5 motifs
 enrich2 <- enrich%>%
    dplyr::filter(fold.enrichment>1, qvalue.hyper<0.1)%>%
    group_by(newCluster)%>%
@@ -257,27 +281,19 @@ p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
          axis.text.x=element_text(angle=60, hjust=1, size=10),
          axis.text.y=element_text(size=8))
 ###
-figfn <- "./4_motif.outs/Figure1.3_dotplot.direction.allpeaks.png"
+figfn <- paste("./4_motif.outs/Figure1.", i, "_dotplot.direction.", feature0, ".png", sep="")
 png(figfn, width=1000, height=1000, res=120)
 print(p)
 dev.off()
 
 
 
+###################################################################
+###  motifs are enriched in DEG for up and down separately, NB  ###
+###################################################################
 
-##############################################################
-###  motifs are enriched in DVG for up and down separately ###
-##############################################################
-
-anno2 <- anno%>%
-   dplyr::filter(grepl("Promoter", annotation),
-                 !grepl("chrX",seqnames),
-                 !grepl("chrY", seqnames))%>%
-   dplyr::select(seqnames, start, end, annotation, geneId, SYMBOL, peak)
-
-
-### results of DVG
-fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/3_phiNew.meta"
+### results of DEG
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/4_mu.meta"
 res <- read.table(fn, header=T)
 resSig <- res%>%as.data.frame()%>%
    mutate(direction=ifelse(beta>0, "Up", "Down"),
@@ -285,13 +301,24 @@ resSig <- res%>%as.data.frame()%>%
    dplyr::filter(qval<0.1, abs(beta)>0.5)
 ##
 genetest <- unique(res$gene)
-anno3 <- anno2%>%dplyr::filter(geneId%in%genetest)
-enrich <- enrich.motif(atac, anno3, resSig, resDP)
-write_rds(enrich, "./4_motif.outs/2.2_motif.DVG.direction.promoter.rds")
+geneList <- str_split(anno$flank_geneIds, ";")
+is_gene <- map_lgl(geneList, ~any((.x)%in%genetest) )
+anno$is_gene <- is_gene 
+anno2 <- anno%>%dplyr::filter(is_gene)
 
 
-###
-###
+feature0 <- "Promoter"
+i <- 2
+enrich <- enrich.motif(atac, anno2, feature=feature0, resSig, resDP)
+opfn <- paste("./4_motif.outs/2.", i, "_motif.DEG.direction.", feature0, ".rds", sep="")
+write_rds(enrich, opfn)
+
+
+
+#################
+### dot plots ###
+#################
+### labels
 clust <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
                  rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
 clust <- paste(rep(clust,times=2), rep(c("Up","Down"), each=16), sep=".")
@@ -303,17 +330,22 @@ names(clust2) <- clust
 lab2 <- gsub("-", "+", clust)
 names(lab2) <- clust2
 
-enrich <- read_rds("./4_motif.outs/2.2_motif.DVG.direction.promoter.rds")%>%
+### read data for plot
+feature0 <- "Allpeaks"
+i <- 3
+fn <- paste("./4_motif.outs/2.", i, "_motif.DEG.direction.", feature0, ".rds", sep="")
+enrich <- read_rds(fn)%>%
    mutate(MCls=gsub("_.*", "", comb),
           contrast=gsub(".*[le]_|_[UD].*", "", comb),
           direction=gsub(".*_", "", comb),
           comb2=paste(contrast, MCls, direction, sep="."),
           newCluster=clust2[as.character(comb2)])%>%as.data.frame()
-         
+
+### top motifs
 enrich2 <- enrich%>%
    ## dplyr::filter(fold.enrichment>1, qvalue.hyper<0.1)%>%
    group_by(newCluster)%>%
-   top_n(n=10, wt=fold.enrichment)%>%ungroup()
+   top_n(n=5, wt=fold.enrichment)%>%ungroup()
 
 topmotif <- enrich2%>%dplyr::pull(motif)
 topmotif <- unique(topmotif)
@@ -337,7 +369,97 @@ p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
          axis.text.x=element_text(angle=60, hjust=1, size=10),
          axis.text.y=element_text(size=8))
 ###
-figfn <- "./4_motif.outs/Figure2.2_dotplot.direction.promoter.png"
+figfn <- paste("./4_motif.outs/Figure2.", i, "_dotplot.DEG.direction.", feature0, ".png", sep="")
+png(figfn, width=1000, height=1000, res=120)
+print(p)
+dev.off()
+
+
+
+
+##############################################################
+###  motifs are enriched in DVG for up and down separately ###
+##############################################################
+
+### results of DVG
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/3_phiNew.meta"
+res <- read.table(fn, header=T)
+resSig <- res%>%as.data.frame()%>%
+   mutate(direction=ifelse(beta>0, "Up", "Down"),
+          comb=paste(MCls, contrast, direction, sep="_"))%>% 
+   dplyr::filter(qval<0.1, abs(beta)>0.5)
+
+##
+genetest <- unique(res$gene)
+geneList <- str_split(anno$flank_geneIds, ";")
+is_gene <- map_lgl(geneList, ~any((.x)%in%genetest) )
+anno$is_gene <- is_gene 
+anno2 <- anno%>%dplyr::filter(is_gene)
+
+feature0 <- "Allpeaks"
+i <- 3
+enrich <- enrich.motif(atac, anno2, feature=feature0, resSig, resDP)
+
+opfn <- paste("./4_motif.outs/3.", i, "_motif.DVG.direction.", feature0, ".rds", sep="")
+write_rds(enrich, opfn)
+
+
+#################################
+### dot plot for enrich motif ###
+#################################
+
+### re-labels
+clust <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
+                 rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
+clust <- paste(rep(clust,times=2), rep(c("Up","Down"), each=16), sep=".")
+###
+ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+clust2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+names(clust2) <- clust
+
+lab2 <- gsub("-", "+", clust)
+names(lab2) <- clust2
+
+### read data for dot plots
+feature0 <- "Allpeaks"
+i <- 3
+fn <- paste("./4_motif.outs/3.", i, "_motif.DVG.direction.", feature0, ".rds", sep="")
+enrich <- read_rds(fn)%>%
+   mutate(MCls=gsub("_.*", "", comb),
+          contrast=gsub(".*[le]_|_[UD].*", "", comb),
+          direction=gsub(".*_", "", comb),
+          comb2=paste(contrast, MCls, direction, sep="."),
+          newCluster=clust2[as.character(comb2)])%>%as.data.frame()
+
+### top 10 motifs
+enrich2 <- enrich%>%
+   ## dplyr::filter(fold.enrichment>1, qvalue.hyper<0.1)%>%
+   group_by(newCluster)%>%
+   top_n(n=5, wt=fold.enrichment)%>%ungroup()
+
+topmotif <- enrich2%>%dplyr::pull(motif)
+topmotif <- unique(topmotif)
+
+enrich3 <- enrich%>%
+   dplyr::filter(motif%in%topmotif, fold.enrichment>1, qvalue.hyper<0.1) 
+
+###
+p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
+   geom_point(aes(size=fold.enrichment, colour=qvalue.hyper))+
+   scale_colour_gradient(name="FDR",
+      low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
+      guide=guide_colourbar(order=1))+
+   scale_size_binned("fold enrichment",
+      guide=guide_bins(show.limits=T, axis=T,
+      axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
+      n.breaks=4)+
+   scale_x_discrete(labels=lab2)+
+   theme_bw()+
+   theme(axis.title=element_blank(),
+         axis.text.x=element_text(angle=60, hjust=1, size=10),
+         axis.text.y=element_text(size=8))
+###
+figfn <- paste("./4_motif.outs/Figure3.", i, "_dotplot.DVG.direction.", feature0, ".png", sep="")
 png(figfn, width=1000, height=1000, res=120)
 print(p)
 dev.off()
