@@ -53,9 +53,10 @@ enrich.motif <- function(atac, anno, feature, resSig, resDP){
       dplyr::filter(!grepl("chrX",seqnames),
                     !grepl("chrY", seqnames))%>%
       dplyr::select(seqnames, start, end, annotation, geneId, SYMBOL, peak)
-  ## if ( feature=="Promoter"){ 
-  ##    anno <- anno%>%dplyr::filter(grepl("Promoter", annotation))
-  ## }
+  ###  
+  if ( feature=="Promoter"){ 
+     anno <- anno%>%dplyr::filter(grepl("Promoter", annotation))
+  }
     
    ### enrich analysis for condition separately
    comb <- sort(unique(resSig$comb))
