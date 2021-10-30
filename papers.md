@@ -1,5 +1,7 @@
 #### paper
 - ArchR is a scalable software package for integrative single-cell chromatin accessibility analysis, https://www.nature.com/articles/s41588-021-00790-6
+- Cicero Predicts cis-Regulatory DNA Interactions from Single-Cell Chromatin Accessibility Data, https://www.cell.com/molecular-cell/fulltext/S1097-2765(18)30547-1#%20
+- A Single-Cell Atlas of In Vivo Mammalian Chromatin Accessibility, https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9
 - Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 - Molecular mechanisms in the regulation of adult neurogenesis during stress, https://www.nature.com/articles/nrn3855
 - Chromatin accessibility profiling methods, https://www.nature.com/articles/s43586-020-00008-9
