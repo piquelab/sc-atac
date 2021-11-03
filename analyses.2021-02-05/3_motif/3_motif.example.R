@@ -66,16 +66,27 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 ##    cvt2
 ## }
 
-##
 getData <- function(motif){
    ###
    X <- read_rds("./2_motif.activities.outs/2_motif.ave.rds")
    bti <- colnames(X)
    cvt <- str_split(bti, "_", simplify=T)
    cvt <- data.frame(rn=bti, MCls=cvt[,1], treats=cvt[,2], sampleID=cvt[,3])
-   cvt$y <- X[motif,] 
+   cvt$y <- X[motif,]
+   MCls <- sort(unique(cvt$MCls))
+   ### 
+   cvt <- map_dfr(MCls, function(oneMCl){
+       cvt2 <- cvt%>%dplyr::filter(MCls==oneMCl)
+       df0 <- cvt2%>%dplyr::filter(treats=="CTRL")%>%
+           dplyr::select(sampleID, y)%>%
+           dplyr::rename("y0"="y")
+       cvt2 <- cvt2%>%left_join(df0, by=c("sampleID"))%>%mutate(y2=y-y0)
+       cvt2
+   })
+###       
    cvt
 }    
+
 
 ##
 getData2 <- function(atac, motif.name.sel){
@@ -101,14 +112,20 @@ col1 <- c("CTRL"="#828282",
    "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")
 
 atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
-motif <- "NR3C1"
 
+
+motifList <- c("NR3C1", "RELA", "NR3C2")
+###
+for ( i in 1:3){
+    
+motif <- motifList[i]
 ### average motif activities for each individual
 cvt <- getData(motif)
 ###
-p <- ggplot(cvt, aes(x=factor(treats), y=y, fill=treats, color=treats))+
+cvt2 <- cvt%>%dplyr::filter(treats!="CTRL")    
+p <- ggplot(cvt2, aes(x=factor(treats), y=y2, fill=treats, color=treats))+
    geom_boxplot(outlier.shape=NA)+
-   geom_jitter(width=0.15, size=0.3)+ 
+    geom_jitter(width=0.15, size=0.3)+ 
    ylab("motif activities")+
    scale_y_continuous(expand=expansion(mult=c(0, 0.2)))+
    scale_fill_manual("", values=col1, labels=lab1)+
@@ -125,35 +142,35 @@ p <- ggplot(cvt, aes(x=factor(treats), y=y, fill=treats, color=treats))+
          legend.position="none")
 
 ###
-figfn <- paste("./3_Example.outs/Figure1.1_", motif, ".barplot.png", sep="")
+figfn <- paste("./3_Example.outs/Figure", i, ".1_", motif, ".boxplot.png", sep="")
 png(figfn, width=500, height=500, res=120)
 print(p)
 dev.off()
+}
+## motif activities for each cell
+## cvt2 <- getData2(atac, motif)%>%dplyr::filter(MCls!="DC")
+## p <- ggplot(cvt2,aes(x=factor(treats), y=y, fill=treats))+
+##    geom_boxplot(outlier.size=0.5)+
+##    ylab("motif activities")+
+##    scale_y_continuous(expand=expansion(mult=c(0, 0.2)))+
+##    scale_fill_manual("", values=col1, labels=lab1)+
+##    ## scale_colour_manual("", values=col1)+ 
+##    scale_x_discrete("", labels=lab1)+
+##    facet_wrap(~MCls, nrow=2, scales="free")+ 
+##    ggtitle(bquote(~italic(.(motif))))+
+##    theme_bw()+
+##    theme(axis.text.x=element_text(angle=-90, hjust=0, size=8),
+##          axis.title.x=element_blank(),
+##          axis.title.y=element_text(size=12),
+##          plot.title=element_text(hjust=0.5, size=12),
+##          strip.text=element_text(size=12),
+##          legend.position="none")
 
-### motif activities for each cell
-cvt2 <- getData2(atac, motif)%>%dplyr::filter(MCls!="DC")
-p <- ggplot(cvt2,aes(x=factor(treats), y=y, fill=treats))+
-   geom_boxplot(outlier.size=0.5)+
-   ylab("motif activities")+
-   scale_y_continuous(expand=expansion(mult=c(0, 0.2)))+
-   scale_fill_manual("", values=col1, labels=lab1)+
-   ## scale_colour_manual("", values=col1)+ 
-   scale_x_discrete("", labels=lab1)+
-   facet_wrap(~MCls, nrow=2, scales="free")+ 
-   ggtitle(bquote(~italic(.(motif))))+
-   theme_bw()+
-   theme(axis.text.x=element_text(angle=-90, hjust=0, size=8),
-         axis.title.x=element_blank(),
-         axis.title.y=element_text(size=12),
-         plot.title=element_text(hjust=0.5, size=12),
-         strip.text=element_text(size=12),
-         legend.position="none")
-
-###
-figfn <- paste("./3_Example.outs/Figure1.2_", motif, ".barplot.png", sep="")
-png(figfn, width=500, height=500, res=120)
-print(p)
-dev.off()
+## ###
+## figfn <- paste("./3_Example.outs/Figure1.2_", motif, ".boxplot.png", sep="")
+## png(figfn, width=500, height=500, res=120)
+## print(p)
+## dev.off()
 
 ## motif <- Motifs(atac)
 ## data <- motif@data
