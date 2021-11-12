@@ -42,7 +42,7 @@ rm(list=ls())
 
 
 ####
-outdir <- "./3_Example.outs/"
+outdir <- "./3.1_Example.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 
@@ -142,7 +142,7 @@ p <- ggplot(cvt2, aes(x=factor(treats), y=y2, fill=treats, color=treats))+
          legend.position="none")
 
 ###
-figfn <- paste("./3_Example.outs/Figure", i, ".1_", motif, ".boxplot.png", sep="")
+figfn <- paste("./3.1_Example.outs/Figure", i, ".1_", motif, ".boxplot.png", sep="")
 png(figfn, width=500, height=500, res=120)
 print(p)
 dev.off()
