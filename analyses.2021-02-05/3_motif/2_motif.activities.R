@@ -271,3 +271,32 @@ dev.off()
 
 
 
+###
+### write differential motif 
+res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+##
+## motif.name <- sort(unique(res$motif))
+## motif.id <- ConvertMotifID(object=motif, name=motif.name)
+## motif.annot <- data.frame(motif.name=motif.name, motif.id=motif.id)
+
+## res <- res%>%left_join(motif.annot, by=c("motif"="motif.name"))
+
+sigs <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))%>%
+   dplyr::filter(qval<0.1, abs(beta)>0.32)%>% ##90%
+   group_by(condition)%>%
+   summarise(ny=n(), .groups="drop")
+
+###
+###
+res2 <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))%>%
+   dplyr::filter(qval<0.1, abs(beta)>0.32)
+
+condition <- sort(unique(res2$condition))
+motif_response <- map(condition, function(one){
+    res2%>%dplyr::filter(condition==one)%>%dplyr::pull(gene)
+})
+names(motif_response) <- condition
+
+opfn <- paste(outdir, "4_response.motif.rds", sep="")
+write_rds(motif_response, opfn)
+
