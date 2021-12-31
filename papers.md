@@ -27,6 +27,7 @@
 - CD4 T-Cell Memory Generation and Maintenance, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4062920/
 - Effector and memory T-cell differentiation: implications for vaccine development, https://www.nature.com/articles/nri778
 - A single-cell atlas of chromatin accessibility in the human genome, https://www.cell.com/cell/fulltext/S0092-8674(21)01279-4
+- Allele-specific open chromatin in human iPSC neurons elucidates functional disease variants, https://www.science.org/doi/full/10.1126/science.aay3983
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
