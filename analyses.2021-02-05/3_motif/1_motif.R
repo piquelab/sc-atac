@@ -7,6 +7,7 @@ library(SeuratObject)
 library(Signac)
 library(SeuratWrappers)
 library(SeuratData)
+library(qqman)
 
 library(JASPAR2020)
 library(TFBSTools)
@@ -36,7 +37,7 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 ###########################
 
 pfm <- getMatrixSet(x=JASPAR2020,
-v   opts=list(species=9606, all_version=F))
+   opts=list(species=9606, all_version=F))
 
 ##
 atac <- read_rds("../1_processing/5.1_reCallPeak.outs/3_scATAC.annot.rds")
@@ -232,7 +233,7 @@ fig <- Heatmap(mat, col=col_fun,
    column_names_gp=gpar(fontsize=10.5),
    raster_device="png")
 
-figfn <- "./1_motif.outs/Figure1.1_heatmap.png"
+figfn <- "./1_motif.outs/Figure2.1_heatmap.png"
 png(figfn, height=800, width=600, res=120)
 set.seed(0)
 fig <- draw(fig)
@@ -244,6 +245,43 @@ enrich%>%mutate(LFC=log2(fold.enrichment))%>%
    dplyr::filter(qvalue.hyper<0.1, LFC>0.5)%>%
    group_by(condition)%>%summarise(ny=n(),.groups="drop")
 
+
+################
+### qq plots ###
+################
+
+res <- read_rds("./1_motif.outs/2_motif.enrich.rds")%>%
+   as.data.frame()%>%
+   drop_na(pvalue)%>%
+   mutate(condition=paste(MCls, contrast, sep="_"))
+
+condition <- sort(unique(res$condition))
+dfNew <- map_dfr(condition, function(ii){
+  res2 <- res%>%dplyr::filter(condition==ii)
+  ngene <- nrow(res2)
+  res2 <- res2%>%
+     arrange(pvalue)%>%
+      mutate(observed=-log10(pvalue), expected=-log10(ppoints(ngene)))
+  res2
+})
+
+lab1 <- c("LPS"="LPS", "LPS-DEX"="LPS+DEX", "PHA"="PHA", "PHA-DEX"="PHA+DEX")
+lab2 <- c("Bcell"="B cell", "Monocyte"= "Monocyte", "NKcell"="NK cell",
+   "Tcell"="T cell")
+p <- ggplot(dfNew, aes(x=expected,y=observed))+
+   ggrastr::rasterise(geom_point(size=0.3, color="grey40"),dpi=300)+
+   geom_abline(colour="red")+
+   facet_grid(MCls~contrast, scales="free",
+      labeller=labeller(contrast=lab1, MCls=lab2))+
+   xlab(bquote("Expected"~ -log[10]~"("~italic(plain(P))~")"))+
+   ylab(bquote("Observed"~-log[10]~"("~italic(plain(P))~")"))+
+   theme_bw()+
+   theme(strip.text=element_text(size=12))
+
+figfn <- "./1_motif.outs/Figure2.2_qq.png"
+png(figfn, width=800, height=800, res=120)
+print(p)
+dev.off()
 
 
 ############################################################
@@ -306,7 +344,7 @@ enriched.motif <- lapply(1:16, function(i){
            "not.interest.in.motif"=enrich2$background-enrich2$observed)
         df <- df%>%mutate("not.interest.not.motif"=n.not-not.interest.in.motif)
         fisher <- cal.fisher(df)
-        enrich2 <- cbind(enrich2,fisher)
+        enrich2 <- cbind(enrich2, fisher)
         enrich2$qvalue.hyper <- p.adjust(enrich2$pvalue,"BH")
         enrich2$qvalue.fisher <- p.adjust(enrich2$pval.fisher,"BH")
         enrich2$MCls <- cell0
@@ -475,22 +513,22 @@ enrich <- enrich%>%mutate(direction2=drt2[as.character(direction)],
 
 ###
 enrich2 <- enrich%>%
-   dplyr::filter(fold.enrichment>1, qvalue.fisher<0.1)%>%
+   ## dplyr::filter(fold.enrichment>1.41, qvalue.fisher<0.1)%>%
    group_by(cluster)%>%
-   top_n(n=5, wt=odds)%>%ungroup()%>%as.data.frame()
+   top_n(n=5, wt=fold.enrichment)%>%ungroup()%>%as.data.frame()
 
 topmotif <- enrich2%>%dplyr::pull(motif)
 ###
 
 enrich3 <- enrich%>%
-   dplyr::filter(motif%in%topmotif, fold.enrichment>1, qvalue.fisher<0.1)
+   dplyr::filter(motif%in%topmotif, fold.enrichment>1.41, qvalue.fisher<0.1)
 ###
 p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
-   geom_point(aes(size=odds, colour=qvalue.fisher))+
+   geom_point(aes(size=fold.enrichment, colour=qvalue.fisher))+
    scale_colour_gradient(name="FDR",
       low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
       guide=guide_colourbar(order=1))+
-   scale_size_binned("odds ratio",
+   scale_size_binned("fold enrichment",
       guide=guide_bins(show.limits=T, axis=T,
           axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
       n.breaks=4)+
@@ -498,10 +536,50 @@ p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
    theme_bw()+
    theme(axis.title=element_blank(),
          axis.text.x=element_text(angle=60, hjust=1, size=10),
-         axis.text.y=element_text(size=7))
+         axis.text.y=element_text(size=8))
 ###
 figfn <- "./1_motif.outs/Figure3.3_dotplot.png"
-png(figfn, width=1000, height=1000, res=120)
+png(figfn, width=1000, height=1050, res=120)
 print(p)
 dev.off()
-                       
+
+
+################
+### qq plots ###
+################
+
+drt2 <- c("0"="Down", "1"="Up")
+res <- read_rds("./1_motif.outs/3_motif.enrich.direction.rds")%>%
+   as.data.frame()%>%
+   drop_na(pvalue)%>%
+   mutate(direction2=drt2[as.character(direction)],
+          comb=paste(MCls, contrast, direction2, sep="_"))
+
+comb <- sort(unique(res$comb))
+dfNew <- map_dfr(comb, function(ii){
+  res2 <- res%>%dplyr::filter(comb==ii)
+  ngene <- nrow(res2)
+  res2 <- res2%>%
+     arrange(pvalue)%>%
+      mutate(observed=-log10(pvalue), expected=-log10(ppoints(ngene)))
+  res2
+})
+
+p <- ggplot(dfNew, aes(x=expected,y=observed))+
+   ggrastr::rasterise(geom_point(size=0.3, color="grey40"),dpi=300)+
+   geom_abline(colour="red")+
+   facet_wrap(vars(comb), scales="free", nrow=7, ncol=4)+
+   xlab(bquote("Expected"~ -log[10]~"("~italic(plain(P))~")"))+
+   ylab(bquote("Observed"~-log[10]~"("~italic(plain(P))~")"))+
+   theme_bw()+
+   theme(axis.text=element_text(size=7),
+         strip.text=element_text(size=8))
+
+figfn <- "./1_motif.outs/Figure3.4_qq.png"
+png(figfn, width=800, height=900, res=120)
+print(p)
+dev.off()
+
+
+
+
