@@ -139,6 +139,79 @@ dev.off()
 
 
 
+######################
+### summary reads  ###
+#####################
+
+fn <- "./2_demux.outs/2_seurat.merge.SNG.rds"
+atac<- read_rds(fn)
+
+## counts <- GetAssayData(sc, slot="counts")
+## nCount_ATAC <- colSums(counts)
+## nFeature_ATAC <- colSums(counts>0)
+###
+meta <- atac@meta.data
+
+meta2 <- meta%>%mutate(treats=gsub(".*-ATAC-|_.*", "", NEW_BARCODE),
+                       treat2=gsub("-EtOH", "", treats),
+                       EXP=gsub("_.*","",NEW_BARCODE))
 
 
+dd2 <- meta2%>%group_by(SNG.BEST.GUESS, treat2)%>%
+   summarise(ncell=n(), reads=mean(nCount_ATAC), ngene=mean(nFeature_ATAC),.groups="drop")
+
+
+
+xx2 <- meta2%>%group_by(EXP)%>%
+   summarise(ncell=n(), reads=mean(nCount_ATAC), ngene=mean(nFeature_ATAC),.groups="drop")
+
+tmp <- dd2%>%
+           group_by(treat2)%>%
+           summarise(nind=n(), ncell=median(ncell), reads=median(reads),ngene=median(ngene),.groups="drop")
+
+
+col1 <- c("CTRL"="#828282",
+   "LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
+   "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")
+lab1 <- c("CTRL"="CTRL",
+   "LPS"="LPS", "LPS-DEX"="LPS+DEX",
+   "PHA"="PHA", "PHA-DEX"="PHA+DEX")
+
+
+fig1 <- ggplot(dd2, aes(x=treat2, y=ncell, fill=treat2))+
+   geom_violin()+xlab("")+ylab("")+
+   ggtitle("#Cells per individual")+
+   scale_fill_manual(values=col1)+
+   scale_x_discrete(labels=lab1)+
+   theme_bw()+
+   theme(legend.position="none",
+   plot.title=element_text(hjust=0.5),
+   axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+###
+fig2 <- ggplot(dd2,aes(x=treat2, y=reads, fill=treat2))+
+   geom_violin()+xlab("")+ylab("")+
+   ggtitle("#UMIs per cell")+
+   scale_fill_manual(values=col1)+
+   scale_x_discrete(labels=lab1)+
+   theme_bw()+
+   theme(legend.position="none",
+         plot.title=element_text(hjust=0.5),
+         axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+###
+fig3 <- ggplot(dd2,aes(x=treat2, y=ngene, fill=treat2))+
+    geom_violin()+xlab("")+ylab("")+
+    ggtitle("#Genes per cell")+
+    scale_fill_manual(values=col1)+
+    scale_x_discrete(labels=lab1)+
+    theme_bw()+
+    theme(legend.position="none",
+          plot.title=element_text(hjust=0.5),
+          axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+## png("./2_kb2_output/Figure2.5_violin.png", width=800, height=500, res=120)
+pdf("./2_demux.outs/Figure2.1_violin.pdf", width=8, height=5)
+print(plot_grid(fig1, fig2, fig3, labels="AUTO", label_fontface="plain", label_x=0.1,  ncol=3))
+dev.off()
 
