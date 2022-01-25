@@ -32,6 +32,7 @@
 - The epigenetic basis of cellular heterogeneity, https://www.nature.com/articles/s41576-020-00300-0
 - A brief history of human disease genetics, https://www.nature.com/articles/s41586-019-1879-7?fbclid=IwAR1FxpKPOBLj2oXAt0qCbRDcLdp8ohg1c8y3j1eEQl59ehmbFVT12tNJ9KM
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
+- Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
