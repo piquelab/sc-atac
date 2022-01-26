@@ -29,6 +29,10 @@
 - A single-cell atlas of chromatin accessibility in the human genome, https://www.cell.com/cell/fulltext/S0092-8674(21)01279-4
 - Allele-specific open chromatin in human iPSC neurons elucidates functional disease variants, https://www.science.org/doi/full/10.1126/science.aay3983
 - The GTEx Consortium atlas of genetic regulatory effects across human tissues, https://www.science.org/doi/10.1126/science.aaz1776
+- The epigenetic basis of cellular heterogeneity, https://www.nature.com/articles/s41576-020-00300-0
+- A brief history of human disease genetics, https://www.nature.com/articles/s41586-019-1879-7?fbclid=IwAR1FxpKPOBLj2oXAt0qCbRDcLdp8ohg1c8y3j1eEQl59ehmbFVT12tNJ9KM
+- Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
+- Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
