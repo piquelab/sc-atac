@@ -178,6 +178,16 @@ atac <- AddMetaData(atac, xNew)
 opfn <- "./4.2_Integrate.outs/3_scATAC.annot.rds"
 write_rds(atac, opfn)
 
+### define cell type based on cluster
+atac <- read_rds("./4.2_Integrate.outs/3_scATAC.annot.rds")
+cell <- c("0"="Tcell", "1"="Tcell", "2"="Monocyte", "3"="Tcell",
+   "4"="Bcell", "5"="NKcell", "6"="Tcell", "7"="Tcell", "8"="Tcell",
+   "9"="Tcell", "10"="Tcell", "11"="DC", "12"="Tcell",
+   "13"="Tcell", "14"="Tcell")
+atac$MCls <- cell[as.character(atac$seurat_clusters)]
+DefaultAssay(atac) <- "ATAC"
+opfn <- "./4.2_Integrate.outs/3_scATAC.annot.rds"
+write_rds(atac, opfn)
 
 
 ##################################
@@ -311,4 +321,23 @@ figfn <- "./4.2_Integrate.outs/Figure3.1_feature.png"
 png(figfn, width=600, height=500, res=120)
 plot_grid(figs_ls[[1]], figs_ls[[2]], figs_ls[[3]], figs_ls[[4]],
    align="hv", nrow=2, ncol=2, byrow=T)
+dev.off()
+
+
+###
+### umap color by cell types
+p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCls", label=T, raster=F)+
+   theme_bw()+
+   scale_color_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+                               "NKcell"="#aa4b56", "Tcell"="#ffaa00",
+                               "DC"="#828282"))+
+   theme(legend.position="none",
+         plot.title=element_blank())
+
+   ## ## ## guides(col=guide_legend(override.aes=list(size=2),ncol=3))+
+   ## theme(legend.title=element_blank(),
+   ##       legend.key.size=grid::unit(0.8,"lines"))
+figfn <- "./4.2_Integrate.outs/Figure3.0_umap.atac.MCls..png"
+png(figfn, width=420, height=500, res=120)
+print(p0)
 dev.off()
