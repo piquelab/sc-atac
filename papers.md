@@ -34,6 +34,12 @@
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
 - Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 
+#### biology function
+- Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
+- Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
+
+
+
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
