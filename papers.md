@@ -39,7 +39,7 @@
 - Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
 - A Functional Genomics Approach to Understand Variation in Cytokine Production in Humans, https://pubmed.ncbi.nlm.nih.gov/27814507/
 - The Roles of Type I Interferon in Bacterial Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5847370/
-
+- Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 
 
 #### tools
