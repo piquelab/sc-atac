@@ -37,6 +37,8 @@
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
 - Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
+- A Functional Genomics Approach to Understand Variation in Cytokine Production in Humans, https://pubmed.ncbi.nlm.nih.gov/27814507/
+- The Roles of Type I Interferon in Bacterial Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5847370/
 
 
 
