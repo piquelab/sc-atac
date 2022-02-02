@@ -47,3 +47,4 @@
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
 - An Introduction to the GenomicRanges Package, https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.htmlhttps://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html
+- ChIPseeker: an R package for ChIP peak Annotation, Comparison and Visualization, http://bioconductor.org/packages/devel/bioc/vignettes/ChIPseeker/inst/doc/ChIPseeker.html
