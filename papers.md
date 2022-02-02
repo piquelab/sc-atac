@@ -34,6 +34,15 @@
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
 - Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 
+#### biology function
+- Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
+- Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
+- A Functional Genomics Approach to Understand Variation in Cytokine Production in Humans, https://pubmed.ncbi.nlm.nih.gov/27814507/
+- The Roles of Type I Interferon in Bacterial Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5847370/
+- Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
+- Androgen and glucocorticoid receptor direct distinct transcriptional programs by receptor-specific and shared DNA binding sites, https://academic.oup.com/nar/article/49/7/3856/6179930
+
+
 #### tools
 - ArchR, https://www.archrproject.com/index.html
 - computational genomics with R, https://compgenomr.github.io/book/
