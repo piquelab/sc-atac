@@ -33,6 +33,7 @@
 - A brief history of human disease genetics, https://www.nature.com/articles/s41586-019-1879-7?fbclid=IwAR1FxpKPOBLj2oXAt0qCbRDcLdp8ohg1c8y3j1eEQl59ehmbFVT12tNJ9KM
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
 - Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
+- Changes in chromatin accessibility are not concordant with transcriptional changes for single-factor perturbations, https://www.biorxiv.org/content/10.1101/2022.02.03.478981v1
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
