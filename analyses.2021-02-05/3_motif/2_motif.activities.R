@@ -45,12 +45,12 @@ write_rds(atac, opfn)
 
 
 ### tsne plots
-atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
-X <- atac@assays$chromvar@data
+## atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
+## X <- atac@assays$chromvar@data
 
-library(tsne)
-xtsne <- tsne(t(X))
-write_rds(xtsne, "./2_motif.activities.outs/1.1_tsne.rds")
+## library(tsne)
+## xtsne <- tsne(t(X))
+## write_rds(xtsne, "./2_motif.activities.outs/1.1_tsne.rds")
 
 
 ###
@@ -270,9 +270,11 @@ fig <- draw(fig)
 dev.off()
 
 
+##
+#################################
+### write differential motif ###
+################################
 
-###
-### write differential motif 
 res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
 ##
 ## motif.name <- sort(unique(res$motif))
@@ -282,14 +284,14 @@ res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
 ## res <- res%>%left_join(motif.annot, by=c("motif"="motif.name"))
 
 sigs <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))%>%
-   dplyr::filter(qval<0.1, abs(beta)>0.32)%>% ##90%
+   dplyr::filter(qval<0.1, beta>0)%>%  ### abs(beta)>0.32)%>% ##90%
    group_by(condition)%>%
    summarise(ny=n(), .groups="drop")
 
 ###
 ###
 res2 <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))%>%
-   dplyr::filter(qval<0.1, abs(beta)>0.32)
+   dplyr::filter(qval<0.1, beta>0)##abs(beta)>0.32)
 
 condition <- sort(unique(res2$condition))
 motif_response <- map(condition, function(one){
@@ -297,6 +299,71 @@ motif_response <- map(condition, function(one){
 })
 names(motif_response) <- condition
 
-opfn <- paste(outdir, "4_response.motif.rds", sep="")
+opfn <- paste(outdir, "4.2_response.motif.positive.rds", sep="")
 write_rds(motif_response, opfn)
 
+
+#####################
+### resonse motif ###
+#####################
+
+outdir <- "./2_motif.activities.outs/"
+
+res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+
+##
+oneMCl <- "Tcell"
+res2 <- res%>%filter(MCls==oneMCl)
+
+th0 <- quantile(abs(res2$beta),probs=0.9)
+th0 <- 0.21
+### CTRL
+res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
+    arrange(desc(abs(beta)))
+opfn <- paste(outdir, "5_",  oneMCl, "_CTRL.motif.txt", sep="")
+write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+
+
+### LPS-EtOH
+res3 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0)%>%
+    arrange(desc(abs(beta)))
+opfn <- paste(outdir, "5_",  oneMCl, "_LPS-EtOH.motif.txt", sep="")
+write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+
+
+### LPS-DEX
+res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0)%>%
+    arrange(desc(abs(beta)))
+opfn <- paste(outdir, "5_",  oneMCl, "_LPS-DEX.motif.txt", sep="")
+write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+ 
+
+### PHA-EtOH
+res3 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
+    arrange(desc(abs(beta)))
+opfn <- paste(outdir, "5_",  oneMCl, "_PHA-EtOH.motif.txt", sep="")
+write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+
+
+### PHA-DEX
+res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0)%>%
+    arrange(desc(abs(beta)))
+opfn <- paste(outdir, "5_",  oneMCl, "_PHA-DEX.motif.txt", sep="")
+write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+
+
+
+
+
+
+
+##############################################################
+### identify motif with high activities in some celll type ###
+##############################################################
+atac2 <- subset(atac2, subset=MCls!="DC")
+
+Y <- atac2@assays$chromvar@data
+meta <- atac2@meta.data%>%
+   mutate(treat=gsub(".*-ATAC-|_.*", "", NEW_BARCODE),
+          bti=paste(MCls, treat, SNG.BEST.GUESS, sep="_"))%>%
+   dplyr::select(NEW_BARCODE, bti) 
