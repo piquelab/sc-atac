@@ -36,7 +36,7 @@
 - Changes in chromatin accessibility are not concordant with transcriptional changes for single-factor perturbations, https://www.biorxiv.org/content/10.1101/2022.02.03.478981v1
 - Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, https://www.biorxiv.org/content/10.1101/2021.05.10.443466v1
 - Noncoding genetic variation in GATA3 increases acute lymphoblastic leukemia risk through local and global changes in chromatin conformation, https://www.nature.com/articles/s41588-021-00993-x
-- A brief history of human disease genetics, https://www.nature.com/articles/s41586-019-1879-7?luicode=10000011&lfid=100103type%3D1%26q%3DNature+Genetics&u=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41586-019-1879-7
+- Chromatin and gene-regulatory dynamics of the developing human cerebral cortex at single-cell resolution, https://www.cell.com/cell/fulltext/S0092-8674(21)00942-9#%20
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
