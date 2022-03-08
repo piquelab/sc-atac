@@ -123,3 +123,123 @@ print(fig2)
 dev.off() 
 
     
+
+######################
+#### scatter plots ###
+######################
+
+feq <- function(x){
+  r <- round(as.numeric(x$estimate),digits=3)
+  p <- x$p.value
+  if(p<0.001) symb <- "***"
+  if(p>=0.001 & p<0.01) symb <- "**"
+  if (p>=0.01 & p<0.05) symb <- "*"
+  if(p>0.05) symb <- "NS"
+  
+  eq <- bquote(italic(R)==.(r)~","~.(symb))
+  eq 
+}
+
+##
+xFun <- function(dx,a=0.5){
+min1 <- min(dx$beta.x)
+max2 <- max(dx$beta.x)
+R <- max2-min1
+xpos <- min1+a*R
+}
+##
+yFun <- function(dx,a=0.8){
+min1 <- min(dx$beta.y)
+max2 <- max(dx$beta.y)
+R <- max2-min1
+ypos <- min1+a*R
+}
+  
+
+    
+### Read data
+
+##load("./6_DEG.CelltypeNew_output/Filter2/Sigs.gene.DEG.RData")
+outdir <- "./3_treatEffect.outs/"
+
+res <- read_rds("./1.2_DiffPeak.outs/2.0_DESeq.results.rds")%>%
+   as.data.frame()%>%
+   mutate(rn2=paste(MCls, gene,  sep="_"))%>%
+   dplyr::rename("beta"="estimate")%>% 
+   dplyr::filter(MCls!="DC")%>%drop_na(beta, p.adjusted) 
+
+## DP <- res%>%drop_na(p.adjusted)%>%
+##    dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)%>%
+##    dplyr::pull(gene)
+## DP <- as.character(unique(DP))
+
+
+
+### (1), beta from LPS-EtOH vs CTRL against beta from LPS-DEX vs LPS-EtOH  
+dfa <- res%>%filter(contrast=="LPS")    
+dfb <- res%>%filter(contrast=="LPS-DEX")%>%dplyr::select(rn2, beta, p.value, p.adjusted)
+       
+df1 <- dfa%>%inner_join(dfb, by="rn2")
+
+anno_df1 <- df1%>%group_by(MCls)%>%
+   nest()%>%
+   mutate(corr=map(data, ~cor.test((.x)$beta.x, (.x)$beta.y, method="pearson")),
+          eq=map(corr,feq),
+          r2=map_dbl(corr,~(.x)$estimate),
+          xpos=map_dbl(data,~xFun(.x,a=0.7)),
+          ypos=map_dbl(data,~yFun(.x,a=1)))%>%
+   dplyr::select(-data,-corr)
+     
+fig1 <- ggplot(df1, aes(x=beta.x, y=beta.y))+
+   rasterise(geom_point(size=0.3, color="grey50"),dpi=300)+ 
+   geom_text(data=anno_df1, aes(x=xpos, y=ypos, label=eq), colour="blue", size=3, parse=T)+ 
+   facet_wrap(~MCls, nrow=2, scales="free")+         
+   scale_x_continuous("LPS effect on gene expression", expand=expansion(mult=0.1))+
+   scale_y_continuous("LPS+DEX effect on gene expression", expand=expansion(mult=0.1))+
+   theme_bw()+
+   theme(strip.background=element_blank(),
+         axis.title=element_text(size=12))
+fig1 <- fig1+geom_smooth(method="lm",formula=y~x, size=0.5, se=F)
+                           
+figfn <- paste(outdir, "Figure2.1_LPS.png", sep="")
+png(filename=figfn, width=500, height=500, pointsize=12, res=120)  
+print(fig1)
+dev.off()
+
+### (2), beta from PHA-EtOH vs CTRL against beta from PHA-DEX vs PHA-EtOH
+dfa <- res%>%filter(contrast=="PHA")    
+dfb <- res%>%filter(contrast=="PHA-DEX")%>%dplyr::select(rn2, beta, p.value, p.adjusted)
+       
+df2 <- dfa%>%inner_join(dfb,by="rn2")
+
+anno_df2 <- df2%>%group_by(MCls)%>%
+    nest()%>%
+    mutate(corr=map(data, ~cor.test((.x)$beta.x, (.x)$beta.y, method="pearson")),
+          eq=map(corr,feq),
+          r2=map_dbl(corr,~(.x)$estimate),
+          xpos=map_dbl(data,~xFun(.x, a=0.7)),
+          ypos=map_dbl(data,~yFun(.x, a=1)))%>%
+   dplyr::select(-data,-corr)
+
+fig2 <- ggplot(df2, aes(x=beta.x,y=beta.y))+
+    rasterise(geom_point(size=0.3, color="grey50"),dpi=300)+ 
+    geom_text(data=anno_df2, aes(x=xpos, y=ypos, label=eq), colour="blue", size=3, parse=T)+ 
+    facet_wrap(~MCls, nrow=2, scales="free")+
+    scale_x_continuous("PHA effect on gene expression", expand=expansion(mult=0.1))+
+    scale_y_continuous("PHA+DEX effect on gene expression", expand=expansion(mult=0.1))+
+    theme_bw()+
+    theme(strip.background=element_blank(),
+          axis.title=element_text(size=12))
+fig2 <- fig2+geom_smooth(method="lm",formula=y~x, size=0.5, se=F)
+                           
+figfn <- paste(outdir, "Figure2.2_PHA.png", sep="")
+png(filename=figfn, width=500, height=500, res=120)  
+print(fig2)
+dev.off()
+
+###
+###
+figfn <- paste(outdir, "Figure2.3_comb.pdf", sep="")
+pdf(figfn, width=10, height=5, pointsize=8)
+print(plot_grid(fig1, fig2, nrow=1, ncol=2, labels="AUTO", label_fontface="plain"))
+dev.off()
