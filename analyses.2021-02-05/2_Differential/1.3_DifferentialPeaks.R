@@ -47,7 +47,7 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F)
 
 
 ### Differntial analysis based reCall peaks
-### apply filtering condition
+### apply new filtering condition, proportion of peaks expressed in the cells
 ### last modified at 2/7/2022, by Julong wei
 
 ####################################
