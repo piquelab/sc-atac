@@ -363,12 +363,13 @@ enriched.motif <- lapply(1:16, function(i){
         enrich2$MCls <- cell0
         enrich2$contrast <- contrast0
         enrich2$direction <- ii
+        enrich2 <- cbind(enrich2, df)
       }else{
         enrich2 <- NA   
       }
       enrich2
    })
-    
+     
    ##return results 
    if ( sum(is.na(enrich))==2){
       enrich <- NA
@@ -566,7 +567,7 @@ dev.off()
 ### qq plots ###
 ################
 
-drt2 <- c("0"="Down", "1"="Up")
+vdrt2 <- c("0"="Down", "1"="Up")
 fn <- paste(outdir, "3_motif.enrich.direction.rds", sep="")
 res <- read_rds(fn)%>%
    as.data.frame()%>%
@@ -601,4 +602,95 @@ dev.off()
 
 
 
+
+###
+### example
+## enrich <- read_rds("./1.2_motif.outs/3_motif.enrich.direction.rds")
+
+ExampleGOplot <- function(cg){
+
+### prepare data    
+   ## x <- str_split(cg$GeneRatio, "/", simplify=T)
+   ## GeneRatio <- as.numeric(x[,1])/as.numeric(x[,2])
+   Drt2 <- c("Up"=1, "Down"=2) 
+   cg <- cg%>%mutate(Direction3=Drt2[direction2],
+      contrast2=paste(Direction3, contrast.x, sep="."))%>%
+      mutate(contrast2=gsub("-", "+", contrast2)) 
+   ## cg$size <- rep(1,nrow(cg))
+   ## cg$size[GeneRatio>=0.05&GeneRatio<0.15] <- 2
+   ## cg$size[GeneRatio>=0.15] <- 3 
+   #
+   cg <- cg%>%drop_na(odds)
+   fig0 <- ggplot(cg, aes(x=contrast2, y=MCls.x))+
+      geom_point(aes(size=odds, colour=qvalue.fisher))+
+      scale_x_discrete(labels=c("1.LPS"="LPS.Up", "2.LPS"="LPS.Down",
+         "1.LPS+DEX"="LPS+DEX.Up", "2.LPS+DEX"="LPS+DEX.Down",
+         "1.PHA"="PHA.Up", "2.PHA"="PHA.Down",
+         "1.PHA+DEX"="PHA+DEX.Up", "2.PHA+DEX"="PHA+DEX.Down"))+
+      scale_colour_gradient(name="p.adjust",                           
+         low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
+         guide=guide_colourbar(order=1))+    #"#ffa500"
+      scale_size_binned("odds ratio",
+         guide=guide_bins(show.limits=TRUE, axis=TRUE,
+           axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
+         n.breaks=4)+
+      theme_bw()+
+      theme(axis.title=element_blank(),
+         axis.text.y=element_text(size=12),
+         legend.background=element_blank(),
+         legend.title=element_text(size=8),
+         legend.text=element_text(size=6),
+         legend.key.size=grid::unit(0.6, "lines"))
+   fig0
+}
+
+
+
+###
+###
+contrast <- c("LPS", "LPS-DEX", "PHA", "PHA-DEX")
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+rn <- paste(rep(contrast, each=8), rep(rep(MCls, each=2), times=4),
+            rep(rep(c("Down", "Up"),times=4), times=4), sep=".")
+tmp <- data.frame(contrast=rep(contrast, each=8),
+   MCls=rep(rep(MCls, each=2), times=4),
+   direction=rep(rep(c("Down", "Up"),times=4), times=4))%>%
+   mutate(rn=paste(contrast, MCls, direction, sep="."))
+
+
+###
+### read data
+enrich <- read_rds("./1.2_motif.outs/3_motif.enrich.direction.rds")
+dir2 <- c("0"="Down", "1"="Up")
+enrich$direction2 <- dir2[as.character(enrich$direction)]
+
+##
+enrich2 <- enrich%>%mutate(cluster=paste(contrast, MCls, direction2, sep="."))%>%
+   filter(motif.name=="NR3C1")
+enrich2 <- enrich2%>%full_join(tmp, by=c("cluster"="rn"))
+p1 <- ExampleGOplot(enrich2)+
+    ggtitle("NR3C1")+
+    theme(axis.text.x=element_text(angle=-90, size=8, hjust=0, vjust=0.5),
+          plot.title=element_text(hjust=0.5))
+
+figfn <- "./1.2_motif.outs/Figure4.1_NR3C1.png"
+png(figfn, width=500, height=400, res=120)
+print(p1)
+dev.off()
+
+##
+enrich2 <- enrich%>%mutate(cluster=paste(contrast, MCls, direction2, sep="."))%>%
+   filter(motif.name=="NR3C2")
+enrich2 <- enrich2%>%full_join(tmp, by=c("cluster"="rn"))
+p2 <- ExampleGOplot(enrich2)+
+   ggtitle("NR3C2")+
+   theme(axis.text.x=element_text(angle=-90, size=8, hjust=0, vjust=0.5),
+         plot.title=element_text(hjust=0.5)) 
+
+###
+figfn <- "./1.2_motif.outs/Figure4.2_NR3C2.png"
+png(figfn, width=500, height=400, res=120)
+print(p2)
+dev.off()
+      
 
