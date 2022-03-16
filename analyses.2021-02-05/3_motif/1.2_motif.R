@@ -43,8 +43,14 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 fn <- "./1_motif.outs/1_scATAC.motif.rds" 
 atac <- read_rds(fn)
 
+
+###
+###
+peaks <- read_rds("./1.3_motif.outs/pct_0.02/1_cell-type_active.peaks.rds")
+
+
 ### differential results
-fn <- "../2_Differential/1.3_DiffPeak.outs/2.0_DESeq.results.rds"
+fn <- "../2_Differential/1.2_DiffPeak.outs/2.0_DESeq.results.rds"
 resDP <- read_rds(fn)%>%as.data.frame()%>%mutate(condition=paste(MCls, contrast, sep="_"))
 
 ## x <- resDP%>%filter(p.adjusted<0.1, abs(estimate)>0.5)
@@ -110,13 +116,16 @@ enriched.motif <- lapply(1:16, function(i){
 ###
    cell0 <- dataset[i,1]
    contrast0 <- dataset[i,2]
-   cat(i, cell0, contrast0, "\n") 
+   cat(i, cell0, contrast0, "\n")
+   ii <- grep(cell0, colnames(peaks)) 
 ###
+   bg.DP <- peaks[peaks[,ii]==1,1] 
    res2 <- resDP%>%dplyr::filter(MCls==cell0, contrast==contrast0)
    top.DP <- res2%>%
        dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)%>%
        dplyr::pull(gene)%>%as.character()
-   bg.DP <- res2%>%dplyr::pull(gene)%>%as.character() 
+   top.DP <- intersect(top.DP, bg.DP)
+   ## 
    n.interest <- length(top.DP)
    n.not <- length(bg.DP)-n.interest
     
@@ -292,7 +301,10 @@ atac <- read_rds(fn)
 ## pfm <- GetMotifData(object=motif, slot="pwm")
 ## motif <- SetMotifData(object=motif, slot="pwm", new.data=pfm)
 ## differential peaks
-fn <- "../2_Differential/1.3_DiffPeak.outs/2.0_DESeq.results.rds"
+
+peaks <- read_rds("./1.3_motif.outs/pct_0.02/1_cell-type_active.peaks.rds")
+
+fn <- "../2_Differential/1.2_DiffPeak.outs/2.0_DESeq.results.rds"
 resDP <- read_rds(fn)%>%as.data.frame()%>%
    mutate(direction=ifelse(estimate>0, 1, 0))
 
@@ -321,6 +333,8 @@ enriched.motif <- lapply(1:16, function(i){
    cell0 <- dataset[i,1]
    contrast0 <- dataset[i,2]
    cat(i, cell0, contrast0, "\n") 
+   ii <- grep(cell0, colnames(peaks)) 
+   bg.DP <- peaks[peaks[,ii]==1,1] 
 ###
    enrich <- lapply(c(0,1),function(ii){ 
       res2 <- resDP%>%
@@ -328,7 +342,8 @@ enriched.motif <- lapply(1:16, function(i){
       top.DP <- res2%>%
          dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5, direction==ii)%>%
          dplyr::pull(gene)%>%as.character()
-      bg.DP <- res2%>%dplyr::pull(gene)%>%as.character() 
+      top.DP <- intersect(top.DP, bg.DP)
+      ##
       n.interest <- length(top.DP)
       n.not <- length(bg.DP)-n.interest
     
