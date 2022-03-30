@@ -37,6 +37,10 @@
 - Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, https://www.biorxiv.org/content/10.1101/2021.05.10.443466v1
 - Noncoding genetic variation in GATA3 increases acute lymphoblastic leukemia risk through local and global changes in chromatin conformation, https://www.nature.com/articles/s41588-021-00993-x
 - Chromatin and gene-regulatory dynamics of the developing human cerebral cortex at single-cell resolution, https://www.cell.com/cell/fulltext/S0092-8674(21)00942-9#%20
+- Integrative analysis of liver-specific non-coding regulatory SNPs associated with the risk of coronary artery disease, https://www.cell.com/ajhg/fulltext/S0002-9297(21)00048-3?dgcid=STMJ_1646393491_SC&utm_campaign=Society%3A%20AJHG&utm_content=200495625&utm_medium=social&utm_source=twitter&hss_channel=tw-18477428
+- Genetic associations at regulatory phenotypes improve fine-mapping of causal variants for 12 immune-mediated diseases, https://www.nature.com/articles/s41588-022-01025-y
+- Sequence determinants of human gene regulatory elements, https://www.nature.com/articles/s41588-021-01009-4#Sec13
+
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
