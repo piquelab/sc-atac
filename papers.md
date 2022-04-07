@@ -41,8 +41,8 @@
 - Genetic associations at regulatory phenotypes improve fine-mapping of causal variants for 12 immune-mediated diseases, https://www.nature.com/articles/s41588-022-01025-y
 - Sequence determinants of human gene regulatory elements, https://www.nature.com/articles/s41588-021-01009-4#Sec13
 - Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
-
-
+- Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
+- 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
 - Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
