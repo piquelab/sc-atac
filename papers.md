@@ -40,6 +40,9 @@
 - Integrative analysis of liver-specific non-coding regulatory SNPs associated with the risk of coronary artery disease, https://www.cell.com/ajhg/fulltext/S0002-9297(21)00048-3?dgcid=STMJ_1646393491_SC&utm_campaign=Society%3A%20AJHG&utm_content=200495625&utm_medium=social&utm_source=twitter&hss_channel=tw-18477428
 - Genetic associations at regulatory phenotypes improve fine-mapping of causal variants for 12 immune-mediated diseases, https://www.nature.com/articles/s41588-022-01025-y
 - Sequence determinants of human gene regulatory elements, https://www.nature.com/articles/s41588-021-01009-4#Sec13
+- Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
+- Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
+- Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
 
 
 #### biology function
