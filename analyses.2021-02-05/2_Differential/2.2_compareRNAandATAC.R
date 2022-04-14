@@ -76,7 +76,7 @@ x1 <- read_rds("./2.2_compareRNAandATAC.outs/1_annot.signac.rds")
 x1 <- x1%>%dplyr::rename("peak_region"="query_region")%>%
   dplyr::select(peak_region, gene_id)  
     
-x2 <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
+ x2 <- read_rds("./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
    as.data.frame()%>%
    mutate(chr=gsub("chr","",seqnames),
           peak_region=paste(chr,start,end,sep="-"))%>%
@@ -340,9 +340,9 @@ dev.off()
 
 
 
-##################################
-### DEG if is enriched in DARs ###
-##################################
+###############################################
+### forest plots DEG if is enriched in DARs ###
+###############################################
 
 ### fisher test function
 cal.fisher <- function(df){
@@ -457,19 +457,24 @@ col.MCl <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
 
 fn <- "./2.2_compareRNAandATAC.outs/3.1_enrich.DEG.csv"
 df <- read.csv(fn, header=T)
-df2 <- data.frame(odds=df$odds,
-   CI.low=df$lower, CI.high=df$upper,
+df2 <- data.frame(odds=log2(df$odds),
+   CI.low=log2(df$lower), CI.high=log2(df$upper),
    comb=gsub("_", ".", df$comb),
    MCls=df$cell, contrast=df$contrast)
+
+ylab2 <- gsub(".*\\.", "", df2$comb)
+names(ylab2) <- df2$comb
+
 ##                  
 p1 <- ggplot(df2, aes(x=odds, y=comb))+
    geom_errorbarh(aes(xmax=CI.high, xmin=CI.low, colour=MCls),
        size=0.5, height=0.2)+
    geom_point(aes(colour=MCls), shape=19, size=1.5)+
    scale_colour_manual(values=col.MCl)+
-   geom_vline(aes(xintercept=1), size=0.25, linetype="dashed")+ 
-   xlab("Odds ratio")+
-   ggtitle("DEGs are enriched in DARs")+    
+   geom_vline(aes(xintercept=0), size=0.25, linetype="dashed")+ 
+   xlab(bquote(~log[2]~" odds ratio"))+
+   ## scale_y_discrete(labels=ylab2)+ 
+   ggtitle("DEGs")+    
    theme_bw()+
    theme(plot.title=element_text(hjust=0.5, size=9),
          axis.title.y=element_blank(),
@@ -480,18 +485,20 @@ p1 <- ggplot(df2, aes(x=odds, y=comb))+
 ###
 fn <- "./2.2_compareRNAandATAC.outs/3.2_enrich.DVG.csv"
 df <- read.csv(fn, header=T)
-df2 <- data.frame(odds=df$odds,
-   CI.low=df$lower, CI.high=df$upper,
+df2 <- data.frame(odds=log2(df$odds),
+   CI.low=log2(df$lower), CI.high=log2(df$upper),
    comb=gsub("_", ".", df$comb),
    MCls=df$cell, contrast=df$contrast)
+
 p2 <- ggplot(df2, aes(x=odds, y=comb))+
    geom_errorbarh(aes(xmax=CI.high, xmin=CI.low, colour=MCls),
        size=0.5, height=0.2)+
    geom_point(aes(colour=MCls), shape=19, size=1.5)+
    scale_colour_manual(values=col.MCl)+
-   geom_vline(aes(xintercept=1), size=0.25, linetype="dashed")+ 
-   xlab("Odds ratio")+
-   ggtitle("DVGs are enriched in DARs")+    
+   geom_vline(aes(xintercept=0), size=0.25, linetype="dashed")+ 
+   xlab(bquote(~log[2]~" odds ratio"))+
+   ## scale_y_discrete(labels=ylab2)+   
+   ggtitle("DVGs")+    
    theme_bw()+
    theme(plot.title=element_text(hjust=0.5, size=9),
          axis.title.y=element_blank(),
@@ -505,3 +512,217 @@ png(figfn, width=680, height=480, res=120)
 plot_grid(p1, p2, ncol=2)
 dev.off()
 
+
+
+#######################
+### Distance to TSS ###
+#######################
+
+###
+### DEGs or DVGs are Distance to peaks
+
+###
+### differential peaks
+fn <- "./1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+resDP <- read_rds(fn)%>%drop_na(p.value)%>%
+   mutate(comb=paste(MCls, contrast, sep="_"))%>%
+   dplyr::rename("peak"="gene")%>%
+   dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)%>%
+   as.data.frame()
+
+peakAll <- unique(resDP$peak)
+
+
+###
+### annotation
+fn <- "./2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds"
+peakAnno <- read_rds(fn)%>%as.data.frame()%>%
+   mutate(peak=paste(gsub("chr", "", seqnames), start, end, sep="-")) 
+peakAnno2 <- peakAnno%>%dplyr::filter(peak%in%peakAll)%>%
+   dplyr::select(peak, geneId, SYMBOL, dtss=distanceToTSS)%>%mutate(dtss=abs(dtss))
+
+
+ ## df2gene <- peakAnno2%>%
+ ##     group_by(geneId)%>%summarise(npeaks=n(), .groups="drop")%>%
+ ##     ungroup()%>%as.data.frame()
+
+
+###
+### DEG is DARs 
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/6_DEG.CelltypeNew_output/Filter2/2_meta.rds"
+resDEG <- read_rds(fn)%>%drop_na(pval)%>%
+   mutate(comb=paste(MCls, contrast, sep="_"))%>%
+   dplyr::filter(qval<0.1, abs(beta)>0.5)%>% 
+   as.data.frame()
+
+## DEG <- res%>%dplyr::filter(qval<0.1, abs(beta)>0.5)%>%
+##     dplyr::pull(gene)%>%unique()
+##
+
+###
+### DVG
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/3_phiNew.meta"
+resDVG <- read.table(fn, header=T) %>%drop_na(pval)%>%
+   mutate(comb=paste(MCls, contrast, sep="_"))%>%
+   dplyr::filter(qval<0.1, abs(beta)>0.5)%>%
+   as.data.frame()
+
+
+###
+###
+comb <- sort(unique(resDEG$comb))
+geneList <- lapply(comb, function(ii){
+###
+   resDP2 <- resDP%>%dplyr::filter(comb==ii)
+   resDE2 <- resDEG%>%dplyr::filter(comb==ii)
+   resDV2 <- resDVG%>%dplyr::filter(comb==ii)
+###
+   DP <- unique(resDP2$peak)
+   DEG <- unique(resDE2$gene)
+   DVG <- unique(resDV2$gene)
+    
+   DEGunq <- setdiff(DEG, DVG)
+   shared <- intersect(DEG, DVG)
+   DVGunq <- setdiff(DVG, DEG)
+   DGall <- union(DEG, DVG)
+
+   ## DEG 
+   x <- peakAnno2%>%dplyr::filter(peak%in%DP, geneId%in%DEG)
+   if(nrow(x)==0){
+      res1 <- NA
+    }else{
+       res1 <- unique(x$geneId)
+    }
+    ##
+    x <- peakAnno2%>%dplyr::filter(peak%in%DP, geneId%in%DVG)
+    if(nrow(x)==0){
+      res2 <- NA
+    }else{
+       res2 <- unique(x$geneId)
+    }
+    res <- list(DEG=res1, DVG=res2)
+})
+
+gene1 <- lapply(geneList, function(x) x[[1]])
+gene1 <- unique(unlist(gene1[!is.na(gene1)]))
+
+gene2 <- lapply(geneList, function(x) x[[2]])
+gene2 <- unique(unlist(gene2[!is.na(gene2)]))
+
+DEG <- unique(resDEG$gene)
+DVG <- unique(resDVG$gene)
+## DEG, 3115/6571, 47%
+## DVG, 579/1409, 41%
+
+
+
+
+###
+### compute the number of differential peaks nearby DEG or DVG genes and distance to DPs of DEG or DVG 
+comb <- sort(unique(resDEG$comb))
+dd <- map_dfr(comb, function(ii){
+###
+   resDP2 <- resDP%>%dplyr::filter(comb==ii)
+   resDE2 <- resDEG%>%dplyr::filter(comb==ii)
+   resDV2 <- resDVG%>%dplyr::filter(comb==ii)
+###
+   DP <- unique(resDP2$peak)
+   DEG <- unique(resDE2$gene)
+   DVG <- unique(resDV2$gene)
+    
+   DEGunq <- setdiff(DEG, DVG)
+   shared <- intersect(DEG, DVG)
+   DVGunq <- setdiff(DVG, DEG)
+   DGall <- union(DEG, DVG)
+   
+###
+  
+   ## d0 <- peakAnno2%>%dplyr::filter(peak%in%DP, !geneId%in%DGall)
+   ## d0 <- d0%>%group_by(geneId)%>%
+   ##    summarise(npeaks=n(), dtss=median(dtss), .groups="drop")%>%
+   ##    ungroup()%>%as.data.frame()%>%
+   ##    mutate(conditions=ii, grp="0")
+    
+  ###  
+  d1 <- peakAnno2%>%dplyr::filter(peak%in%DP, geneId%in%DEG)  
+  d1 <- d1%>%group_by(geneId)%>%
+     summarise(npeaks=n(), dtss=min(dtss), .groups="drop")%>%
+     ungroup()%>%as.data.frame()%>%
+     mutate(conditions=ii, grp="1")
+  ##
+  ## d2 <- peakAnno2%>%dplyr::filter(peak%in%DP, geneId%in%shared)  
+  ## d2 <- d2%>%group_by(geneId)%>%
+  ##    summarise(npeaks=n(), dtss.min=min(dtss),.groups="drop")%>%
+  ##    ungroup()%>%as.data.frame()%>%
+  ##    mutate(conditions=ii, grp="2")
+  ##
+  d2 <- peakAnno2%>%dplyr::filter(peak%in%DP, geneId%in%DVG)  
+  d2 <- d2%>%group_by(geneId)%>%
+     summarise(npeaks=n(), dtss=min(dtss), .groups="drop")%>%
+     ungroup()%>%as.data.frame()%>%
+     mutate(conditions=ii, grp="2")
+  ##
+  dd <- rbind(d1, d2)  
+#
+  dd    
+})    
+
+
+          
+###
+p1 <- ggplot(dd, aes(x=factor(grp), y=log2(npeaks), fill=factor(grp)))+
+   geom_violin()+
+   scale_x_discrete(labels=c("0"="background", "1"="DEG", "3"="DVG-only"))+ 
+   ## scale_fill_manual(values=c("DEG"="#d95f02", "DVG"="#1b9e77"))+
+   ## scale_color_manual(values=c("DEG"="#d95f02", "DVG"="#1b9e77"))+
+   ylab(bquote("Complexity ("~log[2]~" peaks per gene)"))+ 
+   theme_bw()+
+   theme(legend.position="none",
+         axis.title.x=element_blank(),
+         legend.background=element_blank()) 
+
+figfn <- "./2.2_compareRNAandATAC.outs/Figure4.1_complexity_violin.png"
+png(figfn, width=480, height=320, res=120)
+print(p1)
+dev.off()
+
+          
+###
+p2 <- ggplot(dd, aes(x=factor(grp), y=log2(dtss+0.1), fill=factor(grp)))+
+   geom_violin()+
+   scale_x_discrete(labels=c("0"="background", "1"="DEG", "3"="DVG-only"))+ 
+   ## scale_fill_manual(values=c("DEG"="#d95f02", "DVG"="#1b9e77"))+
+   ## scale_color_manual(values=c("DEG"="#d95f02", "DVG"="#1b9e77"))+
+   ylab(bquote("Distance to neary peaks"~log[2]))+ 
+   theme_bw()+
+   theme(legend.position="none",
+         axis.title.x=element_blank(),
+         legend.background=element_blank()) 
+
+figfn <- "./2.2_compareRNAandATAC.outs/Figure4.2_dtss_violin.png"
+png(figfn, width=480, height=320, res=120)
+print(p2)
+dev.off()
+
+
+###
+### summary number of peaks
+dd1 <- dd%>%dplyr::filter(grp==1)
+sum(dd1$npeaks<=10)/nrow(dd1)
+sum(abs(dd1$dtss)<3000)/nrow(dd1)
+## dd1 <- dd1%>%group_by(npeaks)%>%summarise(freq=n(),.groups="drop")%>%
+##    mutate(prop=freq/sum(freq))%>%
+##    ungroup()%>%as.data.frame()
+
+## x1 <- data.frame(order=1, freq=sum(dd1[dd1$npeaks>=1&dd1$npeaks<8,2]), prop=sum(dd1[dd1$npeaks>=1&dd1$npeaks<8,3]))
+## ## x2 <- data.frame(order=2, freq=sum(dd1[dd1$npeaks>=5&dd1$npeaks<11,2]), prop=sum(dd1[dd1$npeaks>=5&dd1$npeaks<11,3]))
+## x2 <- data.frame(order=2, freq=sum(dd1[dd1$npeaks>=8,2]), prop=sum(dd1[dd1$npeaks>=8,3]))                            
+## a <- rbind(x1,x2)
+## a$grp <- 1
+
+dd2 <- dd%>%dplyr::filter(grp==2)
+sum(dd2$npeaks<=10)/nrow(dd2)
+sum(abs(dd2$dtss)<3000)/nrow(dd2)
+
+
+###
