@@ -45,7 +45,7 @@
 - Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
 - Single-cell eQTL mapping identifies cell type–specific genetic control of autoimmune disease, https://www.science.org/doi/10.1126/science.abf3041
 - Single-cell RNA-seq reveals cell type–specific molecular and genetic associations to lupus, https://www.science.org/doi/full/10.1126/science.abf1970
-
+- Single-cell RNA-sequencing reveals widespread personalized, context-specific gene expression regulation in immune cells, https://www.biorxiv.org/content/10.1101/2021.06.04.447088v1.full
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
