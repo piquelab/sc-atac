@@ -240,6 +240,118 @@ x <- res%>%filter(p.adjusted<0.1)%>%group_by(MCls)%>%nest()%>%
     mutate(ngene=map(data, ~(.x)$gene))
 
 
+################
+### barplots ###
+################
+fn <- "./1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+res <- read_rds(fn)%>%as.data.frame()%>%mutate(direction=ifelse(estimate>0,1,0))
+res2 <- res%>%dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)
+sigs <- res2%>%group_by(MCls, contrast, direction)%>%
+   summarise(ny=n(), .groups="drop")%>%
+   mutate(ny2=ifelse(direction==0, -ny, ny))
+
+breaks_value <- pretty(c(-11000, 14000), 5)
+
+p <- ggplot(sigs, aes(x=MCls, y=ny2))+
+   geom_bar(aes(fill=factor(MCls), alpha=factor(direction)), stat="identity")+
+   scale_fill_manual(values=c("Bcell"="#4daf4a",
+      "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00"))+
+   scale_alpha_manual(values=c("0"=0.5, "1"=1))+
+   geom_hline(yintercept=0, color="grey60")+
+   geom_text(aes(x=MCls, y=ny2, label=abs(ny2),
+      vjust=ifelse(direction==1, -0.2, 1.2)), size=3)+
+   scale_y_continuous("", breaks=breaks_value, limits=c(-12000,15000),
+                      labels=abs(breaks_value))+
+   facet_grid(~contrast,
+      labeller=labeller(contrast=c("LPS"="LPS","LPS-DEX"="LPS+DEX",
+                                   "PHA"="PHA", "PHA-DEX"="PHA+DEX")))+
+   theme_bw()+
+   theme(legend.position="none",
+         axis.title.x=element_blank(),
+         axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+###
+figfn <- "./1.2_DiffPeak.outs/Figure2.1_barplot.png"
+png(filename=figfn, width=800, height=400, pointsize=12, res=120)
+print(p)
+dev.off()
+
+
+#################################
+### Final version of barplots ###
+#################################
+    
+Mybinom <- function(subdf){
+   n1<- subdf%>%filter(direction==0)%>%dplyr::pull(ny)
+   n2 <- subdf%>%filter(direction==1)%>%dplyr::pull(ny)
+   ngene <- c(n1, n2)
+   if(n1>n2){
+      res <- binom.test(ngene, 0.5, alternative="greater")
+   }else{
+     res <- binom.test(ngene, 0.5, alternative="less") 
+   }
+   res$p.value
+}
+
+Mysymb <- function(pval){
+  if(pval<0.001) symb <- "***"
+  if(pval>=0.001 & pval<0.01) symb <- "**"
+  if (pval>=0.01 & pval<0.05) symb <- "*"
+  if(pval>0.05) symb <- ""
+  symb
+}
+
+Mypos <- function(subdf){
+ ny <- subdf%>%filter(direction==1)%>%dplyr::pull(ny)
+ ny
+}
+ 
+###
+### Read data
+fn <- "./1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+res <- read_rds(fn)%>%as.data.frame()%>%mutate(direction=ifelse(estimate>0,1,0))
+res2 <- res%>%dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)
+sigs <- res2%>%group_by(MCls, contrast, direction)%>%
+   summarise(ny=n(), .groups="drop")%>%
+   mutate(ny2=ifelse(direction==0, -ny, ny))
+
+breaks_value <- pretty(c(-11000, 14000), 5)
+
+                          
+###add star
+anno_df <- sigs%>%group_by(contrast, MCls)%>%nest()%>%
+           mutate(pval=map_dbl(data, Mybinom), 
+                  symb=map_chr(pval, Mysymb),
+                  ypos=map_dbl(data, Mypos))%>%
+           unnest(cols=c(contrast,MCls))                          
+
+p <- ggplot(sigs, aes(x=MCls, y=ny2))+
+   geom_bar(aes(fill=factor(MCls), alpha=factor(direction)), stat="identity")+
+   scale_fill_manual(values=c("Bcell"="#4daf4a",
+      "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00"))+
+   scale_alpha_manual(values=c("0"=0.5, "1"=1))+
+   geom_hline(yintercept=0, color="grey60")+
+   geom_text(aes(x=MCls, y=ny2, label=abs(ny2),
+      vjust=ifelse(direction==1, -0.2, 1.2)), size=3)+
+   scale_y_continuous("", breaks=breaks_value, limits=c(-12000,15000),
+                      labels=abs(breaks_value))+
+   facet_grid(~contrast,
+      labeller=labeller(contrast=c("LPS"="LPS","LPS-DEX"="LPS+DEX",
+                                   "PHA"="PHA", "PHA-DEX"="PHA+DEX")))+
+   theme_bw()+
+   theme(legend.position="none",
+         axis.title.x=element_blank(),
+         axis.text.x=element_text(angle=-90, hjust=0, vjust=0.5))
+
+
+p2 <- p+geom_text(data=anno_df, aes(x=MCls, y=ypos, label=symb), colour="black", vjust=-1, size=3)
+
+### output
+figfn <- "./1.2_DiffPeak.outs/Figure2.2_barplot_final.png"
+png(filename=figfn, width=800, height=400, pointsize=12, res=120)
+print(p2)
+dev.off()
+
 
 ###########################
 ### if enriched in DEGs ###
