@@ -43,7 +43,12 @@
 - Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
 - Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
 - Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
-
+- Single-cell eQTL mapping identifies cell type–specific genetic control of autoimmune disease, https://www.science.org/doi/10.1126/science.abf3041
+- Single-cell RNA-seq reveals cell type–specific molecular and genetic associations to lupus, https://www.science.org/doi/full/10.1126/science.abf1970
+- Single-cell RNA-sequencing reveals widespread personalized, context-specific gene expression regulation in immune cells, https://www.biorxiv.org/content/10.1101/2021.06.04.447088v1.full
+- Single-cell Atlas of common variable immunodeficiency shows germinal center-associated epigenetic dysregulation in B-cell responses, https://www.nature.com/articles/s41467-022-29450-x
+- Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data, https://www.biorxiv.org/content/10.1101/2022.04.20.488925v1.full
+- Multiple causal variants underlie genetic associationsin humans, https://www.science.org/doi/epdf/10.1126/science.abj5117
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -52,6 +57,7 @@
 - The Roles of Type I Interferon in Bacterial Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5847370/
 - Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 - Androgen and glucocorticoid receptor direct distinct transcriptional programs by receptor-specific and shared DNA binding sites, https://academic.oup.com/nar/article/49/7/3856/6179930
+- Five members of the CEBP transcription factor family are targeted by recurrent IGH translocations in B-cell precursor acute lymphoblastic leukemia (BCP-ALL), https://ashpublications.org/blood/article/109/8/3451/23751/Five-members-of-the-CEBP-transcription-factor
 
 
 #### tools
@@ -59,3 +65,4 @@
 - computational genomics with R, https://compgenomr.github.io/book/
 - An Introduction to the GenomicRanges Package, https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.htmlhttps://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html
 - ChIPseeker: an R package for ChIP peak Annotation, Comparison and Visualization, http://bioconductor.org/packages/devel/bioc/vignettes/ChIPseeker/inst/doc/ChIPseeker.html
+- https://handbook-5-1.cochrane.org/chapter_9/9_5_2_identifying_and_measuring_heterogeneity.htm
