@@ -28,11 +28,12 @@ library(circlize)
 theme_set(theme_grey())
 
 
+
 outdir <- "./1.2_motif.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 ###
-### enrichmenta motif analysis for DESeq2 filtering condition 0.01 pct cells
+### enrichmenta motif analysis for DESeq2 filtering condition 0.02 pct cells
 
 #####################################
 ### enrichment analysis for motif ###
@@ -295,6 +296,8 @@ write_rds(enriched.motif, opfn)
 ### motif enrichment analysis directionally, up and down ###
 ############################################################
 
+rm(list=ls())
+
 fn <- "./1_motif.outs/1_scATAC.motif.rds" 
 atac <- read_rds(fn)
 ## motif <- Motifs(atac)
@@ -304,7 +307,7 @@ atac <- read_rds(fn)
 
 peaks <- read_rds("./1.3_motif.outs/pct_0.02/1_cell-type_active.peaks.rds")
 
-fn <- "../2_Differential/1.2_DiffPeak.outs/2.0_DESeq.results.rds"
+fn <- "../2_Differential/1.3_DiffPeak.outs/3.0_DESeq_indi.results.rds"
 resDP <- read_rds(fn)%>%as.data.frame()%>%
    mutate(direction=ifelse(estimate>0, 1, 0))
 
@@ -326,15 +329,15 @@ cal.fisher <- function(df){
 MCls <- rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), each=4)
 contrast <- rep(c("LPS", "LPS-DEX", "PHA", "PHA-DEX"), times=4)
 dataset <- data.frame(MCls=MCls, contrast=contrast)
-
+ 
 ###enrichment motif analysis
 enriched.motif <- lapply(1:16, function(i){
 ###
    cell0 <- dataset[i,1]
    contrast0 <- dataset[i,2]
    cat(i, cell0, contrast0, "\n") 
-   ii <- grep(cell0, colnames(peaks)) 
-   bg.DP <- peaks[peaks[,ii]==1,1] 
+   icell <- grep(cell0, colnames(peaks)) 
+   bg.DP <- peaks[peaks[,icell]==1,1] 
 ###
    enrich <- lapply(c(0,1),function(ii){ 
       res2 <- resDP%>%
@@ -347,7 +350,7 @@ enriched.motif <- lapply(1:16, function(i){
       n.interest <- length(top.DP)
       n.not <- length(bg.DP)-n.interest
     
-     if(n.interest>5){
+     if(n.interest>100){
         enrich2 <- FindMotifs(
            object=atac,
            features=top.DP,
@@ -450,7 +453,7 @@ fig <- draw(fig)
 dev.off()
 
    
-
+ 
 enrich%>%mutate(LFC=log2(fold.enrichment))%>%
    dplyr::filter(qvalue.hyper<0.1, LFC>0.5)%>%
    group_by(MCls, contrast)%>%summarise(ny=n(),.groups="drop")
@@ -470,6 +473,9 @@ enrich <- enrich%>%
 
 ###
 res <- enrich%>%dplyr::filter(qvalue.hyper<0.1, fold.enrichment>1.41)
+
+length(unique(res$motif))
+
 sigs <- res%>%group_by(MCls, contrast, direction)%>%
    summarise(ny=n(), .groups="drop")
 ###
@@ -509,17 +515,19 @@ dev.off()
 
 ###
 #### label
-clst <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
-   rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
-clst <- paste(rep(clst,times=2), rep(c("Up","Down"), each=16), sep=".")
-###
-ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
-clst2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
-names(clst2) <- clst
+## clst <- paste(rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"), each=4),
+##    rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
+## clst <- paste(rep(clst,times=2), rep(c("Up","Down"), each=16), sep=".")
+## ###
+## ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+## clst2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+## names(clst2) <- clst
 
-lab2 <- gsub("-", "+", clst)
-names(lab2) <- clst2 
+## lab2 <- gsub("-", "+", clst)
+## names(lab2) <- clst2 
 
+library(ggtext, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(glue)
 
 ###
 ### prepare data for plot
@@ -527,22 +535,53 @@ fn <- paste(outdir, "3_motif.enrich.direction.rds", sep="")
 enrich <- read_rds(fn)
 drt2 <- c("0"="Down", "1"="Up")
 enrich <- enrich%>%mutate(direction2=drt2[as.character(direction)],
-   cluster=paste(contrast, MCls, direction2, sep="."),
-   newCluster=clst2[cluster])
+   cluster=paste(contrast, MCls, direction2, sep="."))
+
+
+cl <- paste( rep(c("LPS", "PHA", "LPS+DEX", "PHA+DEX"),each=4),
+   rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
+cl <- paste(rep(cl,times=2), rep(c("Up","Down"), each=16), sep=".")
+
+cluster2 <- 1:32
+names(cluster2) <- cl
+
+
+## ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+## cl2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+## cluster2 <- setNames(cl2, cl)
+## lab2 <- setNames(gsub("-","+",cl),cl2)
+col1 <- c("LPS"="#fb9a99", "LPS+DEX"="#e31a1c", "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")
+col2 <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00")
+
+
+enrich <- enrich%>%
+  mutate(cluster=gsub("-", "+", cluster),
+         contrast=gsub("-", "+", contrast),
+         col.contrast=col1[contrast],
+         col.MCls=col2[MCls],
+         ClusterValue=as.numeric(cluster2[cluster]),
+         ClusterNew=glue("<i style='color:{col.contrast}'>{contrast}.<i style='color:{col.MCls}'>{MCls}.<i style='color:black'>{direction2}"),
+         ClusterNew=fct_reorder(ClusterNew, ClusterValue))
+
+
+##
+##
+## res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+## topmotif2 <- res%>%dplyr::filter(qval<0.1,abs(beta)>1.41)%>%dplyr::pull(motif)%>%unique()
 
 ###
-enrich2 <- enrich%>%
+topmotif <- enrich%>%
    ## dplyr::filter(fold.enrichment>1.41, qvalue.fisher<0.1)%>%
+   ## dplyr::pull(motif)%>%unique()
    group_by(cluster)%>%
-   top_n(n=5, wt=fold.enrichment)%>%ungroup()%>%as.data.frame()
+   top_n(n=6, wt=fold.enrichment)%>%ungroup()%>%dplyr::pull(motif)%>%unique()
 
-topmotif <- enrich2%>%dplyr::pull(motif)
 ###
 
 enrich3 <- enrich%>%
    dplyr::filter(motif%in%topmotif, fold.enrichment>1.41, qvalue.fisher<0.1)
 ###
-p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
+p <- ggplot(enrich3, aes(x=ClusterNew, y=motif.name))+
    geom_point(aes(size=fold.enrichment, colour=qvalue.fisher))+
    scale_colour_gradient(name="FDR",
       low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
@@ -551,16 +590,25 @@ p <- ggplot(enrich3, aes(x=newCluster, y=motif.name))+
       guide=guide_bins(show.limits=T, axis=T,
           axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
       n.breaks=4)+
-   scale_x_discrete(labels=lab2)+ 
+   ## scale_x_discrete(labels=lab2)+
+    
    theme_bw()+
    theme(axis.title=element_blank(),
-         axis.text.x=element_text(angle=60, hjust=1, size=10),
+         axis.text.x=element_markdown(angle=45, hjust=1, size=10),
          axis.text.y=element_text(size=8))
 ###
 figfn <- paste(outdir, "Figure3.3_dotplot.png", sep="")
-png(figfn, width=800, height=850, res=120)
+png(figfn, width=850, height=880, res=120)
 print(p)
 dev.off()
+
+###
+###
+## figfn <- paste(outdir, "Figure3.3.1_dotplot.png", sep="")
+## png(figfn, width=750, height=1000, res=120)
+## print(p)
+## dev.off()
+
 
 
 ################
