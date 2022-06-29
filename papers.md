@@ -49,6 +49,7 @@
 - Single-cell Atlas of common variable immunodeficiency shows germinal center-associated epigenetic dysregulation in B-cell responses, https://www.nature.com/articles/s41467-022-29450-x
 - Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data, https://www.biorxiv.org/content/10.1101/2022.04.20.488925v1.full
 - Multiple causal variants underlie genetic associationsin humans, https://www.science.org/doi/epdf/10.1126/science.abj5117
+- Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
