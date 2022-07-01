@@ -52,6 +52,8 @@
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 - Pioneer factors as master regulators of the epigenome and cell fate, (https://www.nature.com/articles/s41580-022-00464-z?utm_source=nrm_etoc&utm_medium=email&utm_campaign=toc_41580_23_7&utm_content=20220629)
 - 
+- Synthetic regulatory reconstitution reveals principles of mammalian Hox cluster regulation, (https://www.science.org/doi/10.1126/science.abk2820)
+
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
 - Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
