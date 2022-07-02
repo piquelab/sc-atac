@@ -53,6 +53,7 @@
 - Pioneer factors as master regulators of the epigenome and cell fate, (https://www.nature.com/articles/s41580-022-00464-z?utm_source=nrm_etoc&utm_medium=email&utm_campaign=toc_41580_23_7&utm_content=20220629)
 - 
 - Synthetic regulatory reconstitution reveals principles of mammalian Hox cluster regulation, (https://www.science.org/doi/10.1126/science.abk2820)
+- Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
