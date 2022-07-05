@@ -54,6 +54,7 @@
 - 
 - Synthetic regulatory reconstitution reveals principles of mammalian Hox cluster regulation, (https://www.science.org/doi/10.1126/science.abk2820)
 - Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
+- Genetic determinants of co-accessible chromatin regions in activated T cells across humans, https://www.nature.com/articles/s41588-018-0156-2
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
