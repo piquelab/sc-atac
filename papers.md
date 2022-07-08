@@ -64,6 +64,7 @@
 - Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 - Androgen and glucocorticoid receptor direct distinct transcriptional programs by receptor-specific and shared DNA binding sites, https://academic.oup.com/nar/article/49/7/3856/6179930
 - Five members of the CEBP transcription factor family are targeted by recurrent IGH translocations in B-cell precursor acute lymphoblastic leukemia (BCP-ALL), https://ashpublications.org/blood/article/109/8/3451/23751/Five-members-of-the-CEBP-transcription-factor
+- Fighting the Fire: Mechanisms of Inflammatory Gene Regulation by the Glucocorticoid Receptor, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01859/full
 
 
 #### tools
