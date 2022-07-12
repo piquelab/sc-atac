@@ -126,8 +126,9 @@ MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
 
 ### loop by a grid of pct
 pct_grid <- c(0.1, 0.05, 0.02, 0.01)
-for (i in 2:length(pct_grid)){
-###
+## for (i in 2:length(pct_grid)){
+## ###
+i <- 3
 pct0 <- pct_grid[i]
 
 cat("pct", pct0, "\n")
@@ -139,9 +140,8 @@ dz <- read_rds(fn)
 
 ###
 ### loop by cell-type
-## B <- lapply(1:4, function(i){
-## ###
-   k <- 4
+###
+for (k in 1:3){    
    oneMCl <- MCls[k]
 ###    
    Y <- dz[,k+1]
@@ -149,14 +149,14 @@ dz <- read_rds(fn)
 ## fit lasso
    system.time(cvfit <- cv.glmnet(X, Y, family="binomial", type.measure="class"))
 #
-   opfn <- paste(outdir, "2_", k, "_", oneMCl, ".glmnet.rds", sep="")
+   opfn <- paste(outdir, "2.", k, "_", oneMCl, ".glmnet.rds", sep="")
    write_rds(cvfit, opfn)
 
 ##    
    b <- coef(cvfit, s="lambda.1se")
    b <- as.matrix(b)
 ## output
-   opfn <- paste(outdir, "2_", k, "_", oneMCl, ".coef.rds", sep="")
+   opfn <- paste(outdir, "2.", k, "_", oneMCl, ".coef.rds", sep="")
    write_rds(b, opfn)
 } ###
 
@@ -179,53 +179,53 @@ dz <- read_rds(fn)
 
 ##
 ## cvplot
-pct0 <- 0.02
-outdir <- paste("./1.3_motif.outs/pct_", pct0, "/", sep="")
-oneMCl <- "Tcell"
+outdir <- "./1.3_motif.outs/pct_0.02"
+
+
+figfn <- paste(outdir, "Figure0_MCls.lambda.png", sep="")
+png(figfn, width=850, height=800, res=120)
 ##
-fn <- paste(outdir, "2_4_Tcell.glmnet.rds", sep="")
-cvfit <- read_rds(fn)
+par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(2,1,0))
+x <- matrix(1:4, 2, 2, byrow=T)
+layout(x)
 
-
-### a grid of lambda plots
-figfn <- paste(outdir, "Figure0.4_Tcell.lambda.png", sep="")
-png(figfn, width=520, height=380, res=100)
-plot(cvfit)
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+for (k in 1:4){
+##    
+   oneMCl <- MCls[k]
+   fn <- paste("./1.3_motif.outs/pct_0.02/2.", k, "_", oneMCl, ".glmnet.rds", sep="")
+   cvfit <- read_rds(fn)
+   print(plot(cvfit))
+   print(title(main=oneMCl, cex.main=2, font.main=1, line=2.5)) 
+   cat(oneMCl, "\n")
+}
 dev.off()
 
 
+###
+### coef plots
+plotdf <- map_dfr(1:4, function(i){
+   ##
+   fn <- paste(outdir, "2.", i, "_", MCls[i], ".coef.rds", sep="")
+   b <- read_rds(fn)
+   b <- b[-1,]
+   df2 <- data.frame(motif=names(b), x=1:length(b), y=as.numeric(b), MCls=MCls[i])
+   df2
+})    
 
 ###
-### coef plot
-###
-b <- as.matrix(coef(cvfit,s="lambda.min"))
-b2 <- b[-1,]
-df <- data.frame(x=1:length(b2), y=b2)
-p1 <- ggplot(df, aes(x,y))+
+p2 <- ggplot(plotdf, aes(x,y))+
    geom_point(color="red", size=1)+
    geom_segment(aes(xend=x, yend=0), color="blue", size=0.5)+
-   xlab("motif")+ylab("coefficients")+ 
-   ggtitle(paste(oneMCl, "(lambda.min)", sep=""))+ 
-   theme_bw()+
-   theme(plot.title=element_text(hjust=0.5))
-
-###
-b <- as.matrix(coef(cvfit,s="lambda.1se"))
-b2 <- b[-1,]
-df <- data.frame(x=1:length(b2), y=b2)
-p2 <- ggplot(df, aes(x,y))+
-   geom_point(color="red", size=1)+
-   geom_segment(aes(xend=x, yend=0), color="blue", size=0.5)+
-   xlab("motif")+ylab("coefficients")+ 
-   ggtitle(paste(oneMCl, "(lambda.1se)", sep=""))+ 
-   theme_bw()+
-   theme(plot.title=element_text(hjust=0.5))   
+   xlab("motif")+ylab("coefficients")+
+   facet_wrap(~MCls, nrow=2, scales="free")+ 
+   theme_bw()
 
 ##
 ###
-figfn <- paste(outdir, "Figure1.4", "_", oneMCl, ".coef.png", sep="")
-png(figfn, width=480, height=550, res=120)
-plot_grid(p1, p2, nrow=2)
+figfn <- paste(outdir, "Figure0.1_coef.png", sep="")
+png(figfn, width=650, height=550, res=120)
+p2
 dev.off()
 
 
@@ -234,39 +234,54 @@ dev.off()
 ### select motifs ###
 #####################
 
-i <- 4
-oneMCl <- "Tcell"
 
+## for ( i in 1:4){
+##     for(j in 1:20){
+##         ##
+##         fn <- paste(outdir, "4.", i, "_", MCls[i], "_Bootstrap_", j, "_coef_motif.rds", sep="")
+##         if ( !file.exists(fn)) cat(MCls[i], j, "\n")
+##     }
+## }    
+
+
+
+## pct_grid <- c(0.1, 0.05, 0.02, 0.01)
+## for ( k in 2:length(pct_grid)){
 pct_grid <- c(0.1, 0.05, 0.02, 0.01)
-for ( k in 2:length(pct_grid)){
+pct0 <- pct_grid[3]
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+outdir <- paste("./1.3_motif.outs/pct_", pct0, "/", sep="")
+###
+for (i in 1:4){
+##   
+   fn <- paste(outdir, "2.", i, "_", MCls[i], ".coef.rds", sep="")
+   b <- read_rds(fn)
 
-    ###
-    pct0 <- pct_grid[k]
-    dirfn <- paste("./1.3_motif.outs/pct_", pct0, "/", sep="")
-    fn <- paste(dirfn, "2_4_Tcell.coef.rds", sep="")
-    b <- read_rds(fn)
-
-### se
-   bb <- map_dfc(1:20, function(i){
-      ##
-      fn <- paste(dirfn, "4_Tcell_Bootstrap_", i, "_coef_motif.rds", sep="")
+   ### se
+   bb <- map_dfc(1:20, function(k){
+      ##       
+      fn <- paste(outdir, "4.", i, "_", MCls[i], "_Bootstrap_", k, "_coef_motif.rds", sep="")
       b <- read_rds(fn) 
       b
    })
-###
+   ###
    bse <- sqrt(apply(bb, 1, var))
 
   ###  
   res <- data.frame(motif.id=as.character(rownames(b)), coef=b[,1], "bse"=bse)%>%
       mutate(z=coef/bse, pval=pnorm(z, lower.tail=F), "motif.name"=motif.name[motif.id])
-  opfn <- paste(dirfn, "2_4_Tcell.zscore.txt", sep="")
-  write.table(res, opfn, row.names=F, col.names=T, quote=F, sep="\t")  
-  ##
-  ## res2 <- res%>%filter(coef>0, pval<0.05)
-  ## ### output  
-  ## opfn <- paste(dirfn, "2_4_Tcell.selectMotif.txt", sep="")
-  ## write.table(res, opfn, row.names=F, col.names=T, quote=F, sep="\t")
+  res <- res[-1,]
     
+  ###
+  opfn <- paste(outdir, "2.", i, "_", MCls[i], ".zscore.txt", sep="")
+  write.table(res, opfn, row.names=F, col.names=T, quote=F, sep="\t")  
+
+  ## cell-type motif
+  res2 <- res%>%filter(coef>0, pval<0.05)
+  opfn <- paste(outdir, "2.", i, "_", MCls[i], ".selectMotif.txt", sep="")    
+  write.table(res2, opfn, row.names=F, col.names=T, quote=F, sep="\t")
+
+  cat(MCls[i], nrow(res2), "\n")  
 }
 
 ##

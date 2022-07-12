@@ -23,11 +23,17 @@ if (length(args)>0){
     cell <- "Tcell"
 }    
 
-## create directory
-outdir <- paste("./1.3_motif.outs/", cell, "/", sep="")
+###
+### a grid of pct values
+pct_grid <- c(0.1, 0.05, 0.02, 0.01)
+k <- 3
+## for (k in 2:length(pct_grid)){
+##
+pct0 <- pct_grid[k]    
+outdir <- paste("./1.3_motif.outs/pct_", pct0, "/", sep="")
 if ( !file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
-cat(cell, "cv", ii, "\n")
+cat(cell, "cv", ii, "pct", pct0, "\n")
 
 
 ### read bootstrap
@@ -38,7 +44,7 @@ id <- IDs[,ii]
 
 
 ### Y input
-fn <- "./1.3_motif.outs/1_cell-type_active.peaks.rds"
+fn <- paste("./1.3_motif.outs/pct_", pct0, "/", "1_cell-type_active.peaks.rds", sep="")
 dz <- read_rds(fn)
 
 ### X input
@@ -60,7 +66,7 @@ b <- as.matrix(b)
 
 
 ### output
-opfn <- paste(outdir, ii, "_coef_motif.rds", sep="")
+opfn <- paste(outdir, "4.", icell, "_", cell, "_Bootstrap_", ii, "_coef_motif.rds", sep="")
 write_rds(b, opfn)
-
+##}
 ### End
