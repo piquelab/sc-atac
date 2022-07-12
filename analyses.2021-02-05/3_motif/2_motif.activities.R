@@ -28,6 +28,7 @@ library(ComplexHeatmap)
 library(circlize)
 theme_set(theme_grey())
 
+rm(list=ls())
 
 ###
 outdir <- "./2_motif.activities.outs/"
@@ -211,9 +212,31 @@ opfn <- "./2_motif.activities.outs/3_motif.diff.results.rds"
 write_rds(res2, opfn)
 
 
-###
-### significant motif
+
+########################################
+### show heatmap ofsignificant motif ###
+########################################
+
 res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+
+
+###
+## fn <- "./1.2_motif.outs/3_motif.enrich.direction.rds"
+## enrich <- read_rds(fn)
+## drt2 <- c("0"="Down", "1"="Up")
+## enrich <- enrich%>%mutate(direction2=drt2[as.character(direction)],
+##    cluster=paste(contrast, MCls, direction2, sep="."),
+##    newCluster=clst2[cluster])
+###
+## topmotif <- enrich%>%
+##    group_by(cluster)%>%
+##    top_n(n=6, wt=fold.enrichment)%>%ungroup()%>%
+##     dplyr::pull(motif)%>%unique()
+
+## topmotif2 <- enrich%>%
+##     filter(motif%in%topmotif, fold.enrichment>1.41, qvalue.fisher<0.1)%>%
+##     dplyr::pull(motif.name)%>%unique()
+
 sigs <- res%>%dplyr::filter(qval<0.1,abs(beta)>1.41)%>%
    group_by(MCls, contrast)%>%
    summarise(ny=n(), .groups="drop")
@@ -238,8 +261,10 @@ rownames(mat) <- topmotif
 
 ###
 ###
+## condition2 <- c("Bcell_"
+
 b <- as.vector(mat)
-breaks <- quantile(b, probs=seq(0, 1, length.out=100))
+breaks <- quantile(b, probs=seq(0, 1, length.out=100),na.rm=T)
 col_fun <-  colorRamp2(breaks,
    colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(100))
 column_ha <- HeatmapAnnotation(
@@ -261,14 +286,45 @@ fig <- Heatmap(mat, col=col_fun,
    show_row_names=T, show_column_names=T,
    row_names_side="left",
    column_names_gp=gpar(fontsize=9),
-   row_names_gp=gpar(fontsize=6),
+   row_names_gp=gpar(fontsize=7),
    use_raster=F, raster_device="png")
-
+ 
 figfn <- "./2_motif.activities.outs/Figure1.2_heatmap.motif.activities.png"
-png(figfn, height=800, width=700, res=120)
+png(figfn, height=800, width=750, res=120)
 set.seed(0)
 fig <- draw(fig)
 dev.off()
+
+
+
+### swap
+## row_ha <- HeatmapAnnotation(
+##    celltype=gsub("_.*", "", condition),
+##    treatment=gsub(".*_", "", condition),
+##    col=list(
+##       celltype=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+##                  "NKcell"="#aa4b56", "Tcell"="#ffaa00"),
+##       treatment=c("LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
+##                   "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")))
+
+## fig <- Heatmap(t(mat), col=col_fun,
+##    cluster_rows=T, cluster_columns=T,
+##    show_row_dend=T, show_column_dend=F,
+##    top_annotation=row_ha,
+##    heatmap_legend_param=list(title="Diff motif",
+##       title_gp=gpar(fontsize=10),
+##       labels_gp=gpar(fontsize=10), legend_direction="horizontal"),
+##    show_row_names=T, show_column_names=T,
+##    row_names_side="left",
+##    column_names_gp=gpar(fontsize=6),
+##    row_names_gp=gpar(fontsize=9),
+##    use_raster=F, raster_device="png")
+
+## figfn <- "./2_motif.activities.outs/Figure1.3_heatmap.motif.activities.png"
+## png(figfn, height=550, width=700, res=120)
+## set.seed(0)
+## fig <- draw(fig)
+## dev.off()
 
 
 ##
@@ -308,56 +364,56 @@ write_rds(motif_response, opfn)
 ### define  response motif (1) ###
 ##################################
 
-rm(list=ls())
+## rm(list=ls())
 
-outdir <- "./2_motif.activities.outs/"
+## outdir <- "./2_motif.activities.outs/"
 
-res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+## res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
 
-##
-ii <- 4
-oneMCl <- "Tcell"
-res2 <- res%>%filter(MCls==oneMCl)
+## ##
+## ii <- 4
+## oneMCl <- "Tcell"
+## res2 <- res%>%filter(MCls==oneMCl)
 
-th0 <- quantile(abs(res2$beta),probs=0.9)
-## th0 <- 0.21
-### CTRL
-res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
-    arrange(desc(abs(beta)))
-opfn <- paste(outdir, "5_", ii, "_",  oneMCl, "_CTRL.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## th0 <- quantile(abs(res2$beta),probs=0.9)
+## ## th0 <- 0.21
+## ### CTRL
+## res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
+##     arrange(desc(abs(beta)))
+## opfn <- paste(outdir, "5_", ii, "_",  oneMCl, "_CTRL.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
-### LPS-EtOH
-res3 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0)%>%
-    arrange(desc(abs(beta)))
-opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-EtOH.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
-
-
-### LPS-DEX
-res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0)%>%
-    arrange(desc(abs(beta)))
-opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-DEX.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene)) 
+## ### LPS-EtOH
+## res3 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0)%>%
+##     arrange(desc(abs(beta)))
+## opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-EtOH.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
 
-### PHA-EtOH
-res3 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
-    arrange(desc(abs(beta)))
-opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-EtOH.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## ### LPS-DEX
+## res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0)%>%
+##     arrange(desc(abs(beta)))
+## opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-DEX.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene)) 
 
 
-### PHA-DEX
-res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0)%>%
-    arrange(desc(abs(beta)))
-opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-DEX.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## ### PHA-EtOH
+## res3 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
+##     arrange(desc(abs(beta)))
+## opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-EtOH.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
+
+
+## ### PHA-DEX
+## res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0)%>%
+##     arrange(desc(abs(beta)))
+## opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-DEX.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
 
 
@@ -368,60 +424,60 @@ length(unique(res3$gene))
 
 ### consider direction, positive and negative
 
-rm(list=ls())
+## rm(list=ls())
 
 
-outdir <- "./2_motif.activities.outs/"
+## outdir <- "./2_motif.activities.outs/"
 
-res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+## res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
 
-##
-ii <- 4
-oneMCl <- "Tcell"
-res2 <- res%>%filter(MCls==oneMCl)
+## ##
+## ii <- 4
+## oneMCl <- "Tcell"
+## res2 <- res%>%filter(MCls==oneMCl)
 
-th0 <- quantile(abs(res2$beta),probs=0.9)
+## th0 <- quantile(abs(res2$beta),probs=0.9)
 
-### CTRL
-res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0, beta<0)
-###
-opfn <- paste(outdir, "6_", ii, "_",  oneMCl, "_CTRL.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## ### CTRL
+## res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0, beta<0)
+## ###
+## opfn <- paste(outdir, "6_", ii, "_",  oneMCl, "_CTRL.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
-### LPS-EtOH
-res3.1 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0, beta>0)
-##
-res3.2 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0, beta<0)
-res3 <- rbind(res3.1, res3.2)
-opfn <- paste(outdir, "6_",  ii, "_", oneMCl, "_LPS-EtOH.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
-
-
-### LPS-DEX
-res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0, beta>0)
-##
-opfn <- paste(outdir, "6_",  ii, "_", oneMCl, "_LPS-DEX.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene)) 
+## ### LPS-EtOH
+## res3.1 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0, beta>0)
+## ##
+## res3.2 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0, beta<0)
+## res3 <- rbind(res3.1, res3.2)
+## opfn <- paste(outdir, "6_",  ii, "_", oneMCl, "_LPS-EtOH.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
 
-### PHA-EtOH
-res3.1 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0, beta>0)
-res3.2 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0, beta<0) 
-res3 <- rbind(res3.1, res3.2)
-##
-opfn <- paste(outdir, "6_", ii, "_", oneMCl, "_PHA-EtOH.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## ### LPS-DEX
+## res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0, beta>0)
+## ##
+## opfn <- paste(outdir, "6_",  ii, "_", oneMCl, "_LPS-DEX.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene)) 
 
 
-### PHA-DEX
-res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0, beta>0)
-opfn <- paste(outdir, "6_", ii, "_", oneMCl, "_PHA-DEX.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
+## ### PHA-EtOH
+## res3.1 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0, beta>0)
+## res3.2 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0, beta<0) 
+## res3 <- rbind(res3.1, res3.2)
+## ##
+## opfn <- paste(outdir, "6_", ii, "_", oneMCl, "_PHA-EtOH.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
+
+
+## ### PHA-DEX
+## res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0, beta>0)
+## opfn <- paste(outdir, "6_", ii, "_", oneMCl, "_PHA-DEX.motif.txt", sep="")
+## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
+## length(unique(res3$gene))
 
 
 
@@ -432,23 +488,35 @@ length(unique(res3$gene))
 ### union of treatment motifs
 
 res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
-
 ##
-ii <- 4
-oneMCl <- "Tcell"
-res2 <- res%>%filter(MCls==oneMCl)
 
-th0 <- quantile(abs(res2$beta),probs=0.9)
+outdir <- "./2_motif.activities.outs/"
 
-res3 <- res2%>%filter(qval<0.1, abs(beta)>th0)
-##
-opfn <- paste(outdir, "7_", ii, "_", oneMCl, "_union.motif.txt", sep="")
-write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-length(unique(res3$gene))
 
-outdir <- "2_motif.activities.outs/"
-fn <- paste(outdir, "7_4_Tcell_union.motif.txt", sep="")
-x <- read.table(fn)
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+for (i in 1:4){
+   ##
+   oneMCl <- MCls[i]
+   res2 <- res%>%filter(MCls==oneMCl)
+   ## 
+   if( oneMCl!="Monocyte"){ 
+      th0 <- quantile(abs(res2$beta),probs=0.9)
+   }else{   
+      th0 <- quantile(abs(res$beta),probs=0.9)
+   }
+   ## 
+   df2 <- res2%>%
+       filter(qval<0.1, abs(beta)>th0)%>%
+       dplyr::select(gene, motif)%>%distinct(.keep_all=T)
+   ##
+   opfn <- paste(outdir, "7.", i, "_", oneMCl, "_union.motif.txt", sep="")
+   write.table(df2, opfn, row.names=F, quote=F, col.names=T)
+
+   ##
+   cat(oneMCl, nrow(res2),  nrow(df2), th0, length(unique(res2$gene)), "\n")
+}
+
+
 
 ##############################################################
 ### identify motif with high activities in some celll type ###
