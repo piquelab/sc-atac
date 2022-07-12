@@ -50,6 +50,12 @@
 - Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data, https://www.biorxiv.org/content/10.1101/2022.04.20.488925v1.full
 - Multiple causal variants underlie genetic associationsin humans, https://www.science.org/doi/epdf/10.1126/science.abj5117
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
+- Pioneer factors as master regulators of the epigenome and cell fate, (https://www.nature.com/articles/s41580-022-00464-z?utm_source=nrm_etoc&utm_medium=email&utm_campaign=toc_41580_23_7&utm_content=20220629)
+- 
+- Synthetic regulatory reconstitution reveals principles of mammalian Hox cluster regulation, (https://www.science.org/doi/10.1126/science.abk2820)
+- Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
+- Genetic determinants of co-accessible chromatin regions in activated T cells across humans, https://www.nature.com/articles/s41588-018-0156-2
+- Single-nucleus chromatin accessibility profiling highlights regulatory mechanisms of coronary artery disease risk, https://www.nature.com/articles/s41588-022-01069-0
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -59,6 +65,7 @@
 - Immune Modulation of the Hypothalamic-Pituitary-Adrenal (HPA) Axis during Viral Infection, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1224723/
 - Androgen and glucocorticoid receptor direct distinct transcriptional programs by receptor-specific and shared DNA binding sites, https://academic.oup.com/nar/article/49/7/3856/6179930
 - Five members of the CEBP transcription factor family are targeted by recurrent IGH translocations in B-cell precursor acute lymphoblastic leukemia (BCP-ALL), https://ashpublications.org/blood/article/109/8/3451/23751/Five-members-of-the-CEBP-transcription-factor
+- Fighting the Fire: Mechanisms of Inflammatory Gene Regulation by the Glucocorticoid Receptor, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01859/full
 
 
 #### tools
