@@ -343,7 +343,7 @@ for ( i in 1:4){
    ### 
    cat(table(anno2[,2]), "\n")
    ### output    
-   opfn <- gzfile(paste(outdir, "3.", i, "_", oneMCl, "_union_torus.annot.gz", sep=""))
+   opfn <- gzfile(paste(outdir, "3_", oneMCl, "_union_torus.annot.gz", sep=""))
    write.table(anno2, opfn, sep="\t", row.names=F, col.names=T, quote=F)
 }
 ### End
