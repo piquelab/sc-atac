@@ -43,9 +43,11 @@
 - Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
 - Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
 - Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
+
 - Single-cell eQTL mapping identifies cell type–specific genetic control of autoimmune disease, https://www.science.org/doi/10.1126/science.abf3041
 - Single-cell RNA-seq reveals cell type–specific molecular and genetic associations to lupus, https://www.science.org/doi/full/10.1126/science.abf1970
-- Single-cell RNA-sequencing reveals widespread personalized, context-specific gene expression regulation in immune cells, https://www.biorxiv.org/content/10.1101/2021.06.04.447088v1.full
+- Single-cell RNA-sequencing reveals widespread personalized, context-specific gene expression regulation in immune cells, https://www.nature.com/articles/s41467-022-30893-5
+
 - Single-cell Atlas of common variable immunodeficiency shows germinal center-associated epigenetic dysregulation in B-cell responses, https://www.nature.com/articles/s41467-022-29450-x
 - Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data, https://www.biorxiv.org/content/10.1101/2022.04.20.488925v1.full
 - Multiple causal variants underlie genetic associationsin humans, https://www.science.org/doi/epdf/10.1126/science.abj5117
@@ -54,6 +56,7 @@
 - Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
 - Genetic determinants of co-accessible chromatin regions in activated T cells across humans, https://www.nature.com/articles/s41588-018-0156-2
 - Single-nucleus chromatin accessibility profiling highlights regulatory mechanisms of coronary artery disease risk, https://www.nature.com/articles/s41588-022-01069-0
+
 - Single-cell eQTL models reveal dynamic T cell state dependence of disease loci, https://www.nature.com/articles/s41586-022-04713-1
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 - Tissue-resident memory CD8+ T cells possess unique transcriptional, epigenetic and functional adaptations to different tissue environments,
