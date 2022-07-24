@@ -57,6 +57,7 @@ https://www.nature.com/articles/s41590-022-01229-8
 - Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
 - Genetic determinants of co-accessible chromatin regions in activated T cells across humans, https://www.nature.com/articles/s41588-018-0156-2
 - Single-nucleus chromatin accessibility profiling highlights regulatory mechanisms of coronary artery disease risk, https://www.nature.com/articles/s41588-022-01069-0
+- Single-cell eQTL models reveal dynamic T cell state dependence of disease loci, https://www.nature.com/articles/s41586-022-04713-1
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
