@@ -51,7 +51,8 @@
 - Multiple causal variants underlie genetic associationsin humans, https://www.science.org/doi/epdf/10.1126/science.abj5117
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 - Pioneer factors as master regulators of the epigenome and cell fate, (https://www.nature.com/articles/s41580-022-00464-z?utm_source=nrm_etoc&utm_medium=email&utm_campaign=toc_41580_23_7&utm_content=20220629)
-- 
+- Tissue-resident memory CD8+ T cells possess unique transcriptional, epigenetic and functional adaptations to different tissue environments,
+https://www.nature.com/articles/s41590-022-01229-8
 - Synthetic regulatory reconstitution reveals principles of mammalian Hox cluster regulation, (https://www.science.org/doi/10.1126/science.abk2820)
 - Enhancer variants: evaluating functions in common disease, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-014-0085-3
 - Genetic determinants of co-accessible chromatin regions in activated T cells across humans, https://www.nature.com/articles/s41588-018-0156-2
