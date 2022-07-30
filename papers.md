@@ -74,6 +74,7 @@ https://www.nature.com/articles/s41590-022-01229-8
 - Glucocorticoids: exemplars of multi-tasking, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1760726/
 - Glucocorticoid receptor control of transcription: precision and plasticity via allostery, https://www.nature.com/articles/nrm.2016.152
 - Effects of glucocorticoids on gene transcription, https://www.sciencedirect.com/science/article/pii/S0014299904007204?via%3Dihub
+- https://www.sciencedirect.com/science/article/pii/S0888754321003554
 
 
 #### tools
