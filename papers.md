@@ -61,6 +61,9 @@
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 - Tissue-resident memory CD8+ T cells possess unique transcriptional, epigenetic and functional adaptations to different tissue environments,
 https://www.nature.com/articles/s41590-022-01229-8
+- Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
+
+
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
