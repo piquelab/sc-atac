@@ -61,6 +61,8 @@
 - Immune disease risk variants regulate gene expression dynamics during CD4+ T cell activation, https://www.nature.com/articles/s41588-022-01066-3
 - Tissue-resident memory CD8+ T cells possess unique transcriptional, epigenetic and functional adaptations to different tissue environments,
 https://www.nature.com/articles/s41590-022-01229-8
+- The whole blood transcriptional regulation landscape in 465 COVID-19 infected samples from Japan COVID-19 Task Force, (https://www.nature.com/articles/s41467-022-32276-2)
+
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -71,6 +73,11 @@ https://www.nature.com/articles/s41590-022-01229-8
 - Androgen and glucocorticoid receptor direct distinct transcriptional programs by receptor-specific and shared DNA binding sites, https://academic.oup.com/nar/article/49/7/3856/6179930
 - Five members of the CEBP transcription factor family are targeted by recurrent IGH translocations in B-cell precursor acute lymphoblastic leukemia (BCP-ALL), https://ashpublications.org/blood/article/109/8/3451/23751/Five-members-of-the-CEBP-transcription-factor
 - Fighting the Fire: Mechanisms of Inflammatory Gene Regulation by the Glucocorticoid Receptor, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01859/full
+- Glucocorticoids: exemplars of multi-tasking, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1760726/
+- Glucocorticoid receptor control of transcription: precision and plasticity via allostery, https://www.nature.com/articles/nrm.2016.152
+- Effects of glucocorticoids on gene transcription, https://www.sciencedirect.com/science/article/pii/S0014299904007204?via%3Dihub
+- https://www.sciencedirect.com/science/article/pii/S0888754321003554
+- Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
 
 
 #### tools
