@@ -240,7 +240,7 @@ write.csv(summ2, opfn2, row.names=F)
 
 
 #############################################################################
-### 5, add SNP annotation hit by peak, T-cell motifs and treatment motifs ###
+### 5, add SNP annotation hit by peak, cell-type motifs and treatment motifs ###
 #############################################################################
 
 ### definition of response motifs in the (3) way, union of response motifs
@@ -334,10 +334,10 @@ for ( i in 1:4){
    snpmotif <- unique(snpmotif)
    snpmotif2 <- allsnp%>%filter(chr_pos%in%snpmotif)%>%dplyr::pull(V3)
    snpmotif2 <- unique(snpmotif2)
-
+   ## cell-type motifs
    anno[anno[,2]==1&anno[,1]%in%snpmotif2, 2] <- 2 
 
-   ###
+   ### response motif
    anno2 <- anno
    anno2[anno2[,2]!=0&anno2[,1]%in%response.motif,2] <- 3
    ### 
