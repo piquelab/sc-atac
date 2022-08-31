@@ -4,7 +4,7 @@
 ## library("corpcor")
 ## library(Matrix)
 ## library(MASS)
-## library(scales)
+## library(scales) 
 library(tidyverse)
 ## library(parallel)
 library(data.table)
@@ -20,6 +20,8 @@ library(monocle3)
 ###
 library(ggplot2)
 library(cowplot)
+library(patchwork)
+library(ggtext)
 library(RColorBrewer)
 library(viridis)
 theme_set(theme_grey())
@@ -28,6 +30,11 @@ outdir <- "./4.2_Integrate.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 rm(list=ls())
 
+
+####
+#### Final version
+### cicero infer gene activity and then annotate cell-types
+### Last modified, Aug 31, By Julong Wei
 
 
 ########################################
@@ -283,6 +290,13 @@ print(p2)
 dev.off()
 
 
+####
+####
+ref <- LoadH5Seurat("../pbmc_multimodal.h5seurat")
+
+atac <- read_rds("./4.2_Integrate.outs/1.1_scATAC.cicero.rds")
+DefaultAssay(atac) <- "ACTIVITY"
+
 
 ################################################
 ### umap of cell type-related marker feature ###
@@ -337,7 +351,153 @@ p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCls", label=T, raster=F)+
    ## ## ## guides(col=guide_legend(override.aes=list(size=2),ncol=3))+
    ## theme(legend.title=element_blank(),
    ##       legend.key.size=grid::unit(0.8,"lines"))
-figfn <- "./4.2_Integrate.outs/Figure3.0_umap.atac.MCls..png"
+figfn <- "./4.2_Integrate.outs/Figure3.0_umap.atac.MCls.png"
 png(figfn, width=420, height=500, res=120)
 print(p0)
 dev.off()
+
+
+p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCls", label=T, raster=F)+
+   theme_bw()+
+   scale_color_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+                               "NKcell"="#aa4b56", "Tcell"="#ffaa00",
+                               "DC"="#828282"))+
+   xlab("UMAP_1")+ylab("UMAP_2")+ 
+   theme(legend.position="none",
+         plot.title=element_blank())
+
+   ## ## ## guides(col=guide_legend(override.aes=list(size=2),ncol=3))+
+   ## theme(legend.title=element_blank(),
+   ##       legend.key.size=grid::unit(0.8,"lines"))
+figfn <- "./4.2_Integrate.outs/Figure3.0.1_umap.atac.MCls.png"
+png(figfn, width=550, height=420, res=120)
+print(p0)
+dev.off()
+
+
+
+######################
+### coverage plots ###
+######################
+
+fn <- "./4.2_Integrate.outs/3_scATAC.annot.rds"
+atac <- read_rds(fn)
+## DefaultAssay(atac) <- "ACTIVITY"
+
+geneList <- c("MS4A1", "MS4A7", "GNLY", "CD8A", "CD14", "LYZ", "IL7R", "S100A4", "CLEC9A", "CST3", "FCER1A")
+
+### genes
+##
+i <- 11
+geneId <- geneList[i]    
+cat(i, geneId, "\n")
+p <- CoveragePlot(atac, region=geneId,
+   group.by="MCls", extend.upstream=1e+03, extend.downstream=1e+03, links=F)&
+   scale_fill_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+       "NKcell"="#aa4b56", "Tcell"="#ffaa00","DC"="#828282"))&
+   ## ggtitle(bquote(~italic(.(geneId))))&
+   theme(legend.position="none", plot.title=element_text(hjust=0.5))
+
+###
+figfn <- paste("./4.2_Integrate.outs/Figure4.", i, "_", geneId, "_coverage.png", sep="")
+png(figfn, width=580, height=400, res=100)
+print(p)
+dev.off()
+    
+
+
+##
+### used for AnnotationPlot plot
+FindRegion <- function(
+   object,
+   region,
+   sep = c("-", "-"),
+   assay = NULL,
+   extend.upstream = 0,
+   extend.downstream = 0
+) {
+  if (!is(object = region, class2 = "GRanges")) {
+      # first try to convert to coordinates, if not lookup gene
+      region <- tryCatch(
+         expr = suppressWarnings(
+           expr = StringToGRanges(regions = region, sep = sep)
+           ),
+           error = function(x) {
+              region <- LookupGeneCoords(
+                 object = object,
+                 assay = assay,
+                 gene = region
+                 )
+                 return(region)
+            }
+        )
+        if (is.null(x = region)) {
+           stop("Gene not found")
+         }
+      }
+      region <- suppressWarnings(expr = Extend(
+          x = region,
+          upstream = extend.upstream,
+          downstream = extend.downstream
+       )
+       )
+       return(region)
+ }
+
+
+###
+###
+geneList <- c("MS4A1", "FCER1A", "LYZ", "GNLY", "IL7R")
+figs_ls <- lapply(1:5, function(i){
+   ###
+   geneId <- geneList[i]
+
+   ### ATAC, Chromatin accessibility 
+   p1 <- CoveragePlot(atac, region=geneId, show.bulk=F, peaks=F, annotation=F, 
+      group.by="MCls", extend.upstream=1e+03, extend.downstream=1e+03, links=F)&
+   scale_fill_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
+       "NKcell"="#aa4b56", "Tcell"="#ffaa00","DC"="#828282"))&
+   ylab("Normalized accessibility")&       
+   ggtitle(bquote(~italic(.(geneId))))&
+   theme(legend.position="none",
+         plot.title=element_text(hjust=0.5),
+         axis.title.x=element_blank(),
+         axis.text.x=element_blank(),
+         axis.ticks.x=element_blank(),
+         axis.ticks.y=element_blank(),
+         strip.text.y.left=element_blank())
+
+  ## gene annotation
+  region <- FindRegion(atac, region=geneId, assay="ATAC", extend.upstream=1e+03, extend.downstream=1e+03)
+  p2 <- AnnotationPlot(atac, region=region)+
+     theme(axis.title.x=element_blank(),
+           axis.text.x=element_blank(),
+           axis.ticks.x=element_blank(),
+           axis.title.y=element_blank())
+
+  ###  
+  p <- wrap_plots(p1, p2, ncol=1, heights=c(8, 1.2))  
+  ##        
+  p
+})
+
+###
+figfn <-"./4.2_Integrate.outs/Figure5_MCls.coverage.png"
+png(figfn, width=700, height=400, res=100)
+plot_grid(plotlist=figs_ls, ncol=5)
+dev.off()
+
+
+###
+### annotation
+## i <- 1
+## geneId <- geneList[i]
+## region <- FindRegion(atac, region=geneId, assay="ATAC", extend.upstream=1e+03, extend.downstream=1e+03)
+## p2 <- AnnotationPlot(atac, region=region)+
+##    theme(axis.title.x=element_blank(),
+##          axis.text.x=element_blank(),
+##          axis.ticks.x=element_blank())
+## figfn <-"./4.2_Integrate.outs/Figure5.1_MCls.coverage.png"
+## png(figfn, width=580, height=400, res=100)
+## p2
+## dev.off()
