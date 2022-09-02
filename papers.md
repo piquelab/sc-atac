@@ -63,6 +63,8 @@
 https://www.nature.com/articles/s41590-022-01229-8
 - The whole blood transcriptional regulation landscape in 465 COVID-19 infected samples from Japan COVID-19 Task Force, (https://www.nature.com/articles/s41467-022-32276-2)
 - https://www.science.org/doi/10.1126/sciadv.abn6240, Spatiotemporal NF-κB dynamics encodes the position, amplitude, and duration of local immune inputs
+- Nonparametric single-cell multiomic characterization of trio relationships between transcription factors, target genes, and cis-regulatory regions, 
+https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author#!
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
