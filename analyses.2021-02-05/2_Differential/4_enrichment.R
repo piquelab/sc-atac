@@ -1,3 +1,4 @@
+
 ##
 library(tidyverse)
 library(annotables)
@@ -18,7 +19,8 @@ library(ggsignif)
 library(pheatmap)
 library(corrplot)
 library(viridis)
-theme_set(theme_grey())
+
+## theme_set(theme_grey())
 
 rm(list=ls())
 
@@ -28,7 +30,27 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 
 ###
-res <- read_rds("./1.2_DiffPeak.outs/2.0_DESeq.results.rds")
+### select peaks at at least 2% cells for each cell-type
+atac <- read_rds("../1_processing/5.1_reCallPeak.outs/3_scATAC.annot.rds")
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell", "DC")
+peakSel <- lapply(MCls, function(ii){
+    ##
+    atac2 <- subset(atac, subset=MCls==ii)
+    count <- atac2@assays$ATAC@counts
+    rpz <- rowMeans(count>0)
+    peakSel2 <- rownames(count)[rpz>0.02]
+    peakSel2
+})
+peakSel <- do.call(c, peakSel)
+peakSel <- unique(peakSel)
+
+
+###
+###
+
+###
+res <- read_rds("./1.3_DiffPeak.outs/3.0_DESeq_indi.results.rds")
+## res <- res%>%filter(gene%in%peakSel)
 
 peakAnno <- read_rds("2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
    as.data.frame()%>%
@@ -95,29 +117,43 @@ write_rds(cg,"./4_enrichment.outs/1_enrichGO.rds")
 ### show figures ###
 ####################
 
+library(ggtext, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(glue)
+
 cg <- read_rds("./4_enrichment.outs/1_enrichGO.rds")
 
-cl <- paste( rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"),each=4),
+cl <- paste( rep(c("LPS", "PHA", "LPS+DEX", "PHA+DEX"),each=4),
    rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
 cl <- paste(rep(cl,times=2), rep(c("Up","Down"), each=16), sep=".")
 
-ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
-cl2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
-cluster2 <- setNames(cl2, cl)
-lab2 <- setNames(gsub("-","+",cl),cl2)
+cluster2 <- 1:32
+names(cluster2) <- cl
 
-##
-cg0 <- as.data.frame(cg)
-x <- cluster2[as.character(cg0$Cluster)]
-cg2 <- cg%>%
-   mutate(ClusterNew=x,
-          maxGSSize=as.numeric(gsub("/.*", "", BgRatio)),
-           ngene=as.numeric(gsub(".*/", "", GeneRatio)))%>%
-   dplyr::filter(maxGSSize>10, maxGSSize<500, ngene>10, p.adjust<0.1)
+
+## ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+## cl2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+## cluster2 <- setNames(cl2, cl)
+## lab2 <- setNames(gsub("-","+",cl),cl2)
+col1 <- c("LPS"="#fb9a99", "LPS+DEX"="#e31a1c", "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")
+col2 <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00")
+
+
+cg <- cg%>%
+  mutate(Cluster=gsub("-", "+", Cluster),
+         contrast=gsub("-", "+", contrast),
+         col.contrast=col1[contrast],
+         col.MCls=col2[MCls],
+         ClusterValue=as.numeric(cluster2[Cluster]),
+         ClusterNew=glue("<i style='color:{col.contrast}'>{contrast}.<i style='color:{col.MCls}'>{MCls}.<i style='color:black'>{direction}"),
+         ClusterNew=fct_reorder(ClusterNew, ClusterValue),
+         maxGSSize=as.numeric(gsub("/.*", "", BgRatio)),
+         ngene=as.numeric(gsub(".*/", "", GeneRatio)) )
+
+cg2 <- cg%>%dplyr::filter(maxGSSize>10, maxGSSize<500, ngene>10, p.adjust<0.1)
 
 fig1 <- enrichplot::dotplot(cg2, x="ClusterNew", showCategory=5)+
-   scale_x_discrete("", labels=lab2)+
-   theme(axis.text.x=element_text(angle=60, hjust=1,size=12),
+   theme(axis.title=element_blank(),
+         axis.text.x=element_markdown(angle=45, hjust=1,size=16),
          axis.text.y=element_text(size=10))
 
 ### 
@@ -129,7 +165,7 @@ dev.off()
 
 ###
 figfn <- "./4_enrichment.outs/Figure1.1_GO.pdf"
-pdf(figfn, width=20, height=15)
+pdf(figfn, width=18, height=15)
 print(fig1)
 dev.off()
 
@@ -158,38 +194,50 @@ write_rds(ck,"./4_enrichment.outs/2_enrichKEGG.rds")
 
 ck <- read_rds("./4_enrichment.outs/2_enrichKEGG.rds")
 
-cl <- paste( rep(c("LPS", "PHA", "LPS-DEX", "PHA-DEX"),each=4),
+
+cl <- paste( rep(c("LPS", "PHA", "LPS+DEX", "PHA+DEX"),each=4),
    rep(c("Bcell", "Monocyte", "NKcell", "Tcell"), times=4), sep=".")
 cl <- paste(rep(cl,times=2), rep(c("Up","Down"), each=16), sep=".")
 
-ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
-cl2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
-cluster2 <- setNames(cl2, cl)
-lab2 <- setNames(gsub("-","+",cl),cl2)
+cluster2 <- 1:32
+names(cluster2) <- cl
 
-##
-ck0 <- as.data.frame(ck)
-x <- cluster2[as.character(ck0$Cluster)]
-ck2 <- ck%>%
-   mutate(ClusterNew=x,
-          maxGSSize=as.numeric(gsub("/.*", "", BgRatio)),
-          ngene=as.numeric(gsub(".*/", "", GeneRatio)))%>%
-   dplyr::filter(maxGSSize>10, maxGSSize<500, ngene>10, p.adjust<0.1)
+
+## ii <- paste(rep(c("A","B","C","D"),each=4),rep(1:4,times=4), sep="")
+## cl2 <- paste(rep(c("X","Y"),each=16), rep(ii,times=2), sep=".")
+## cluster2 <- setNames(cl2, cl)
+## lab2 <- setNames(gsub("-","+",cl),cl2)
+col1 <- c("LPS"="#fb9a99", "LPS+DEX"="#e31a1c", "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")
+col2 <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00")
+
+
+ck <- ck%>%
+  mutate(Cluster=gsub("-", "+", Cluster),
+         contrast=gsub("-", "+", contrast),
+         col.contrast=col1[contrast],
+         col.MCls=col2[MCls],
+         ClusterValue=as.numeric(cluster2[Cluster]),
+         ClusterNew=glue("<i style='color:{col.contrast}'>{contrast}.<i style='color:{col.MCls}'>{MCls}.<i style='color:black'>{direction}"),
+         ClusterNew=fct_reorder(ClusterNew, ClusterValue),
+         maxGSSize=as.numeric(gsub("/.*", "", BgRatio)),
+         ngene=as.numeric(gsub(".*/", "", GeneRatio)) )
+
+ck2 <- ck%>%dplyr::filter(maxGSSize>10, maxGSSize<500, ngene>10, p.adjust<0.1)
 
 fig2 <- enrichplot::dotplot(ck2, x="ClusterNew", showCategory=5)+
-   scale_x_discrete("", labels=lab2)+
-   theme(axis.text.x=element_text(angle=60, hjust=1,size=12),
-         axis.text.y=element_text(size=10))
+   theme(axis.title=element_blank(),
+         axis.text.x=element_markdown(angle=45, hjust=1,size=16),
+         axis.text.y=element_text(size=13))
 
 ###
 figfn <- "./4_enrichment.outs/Figure2.1_KEGG.png"
-png(figfn, width=2000, height=1500, res=150)
+png(figfn, width=2000, height=1500, res=120)
 print(fig2)
 dev.off()
 
 ##
 figfn <- "./4_enrichment.outs/Figure2.1_KEGG.pdf"
-pdf(figfn, width=20, height=15)
+pdf(figfn, width=18, height=15)
 print(fig2)
 dev.off()
 
@@ -221,40 +269,47 @@ odds.fun <-  function(df){
 }
 
 
-ExampleGOplot <- function(cg){
+ExampleGOplot <- function(cg, nbreak){ 
 
 ### prepare data    
    ## x <- str_split(cg$GeneRatio, "/", simplify=T)
    ## GeneRatio <- as.numeric(x[,1])/as.numeric(x[,2])
    Drt2 <- c("Up"=1, "Down"=2) 
-   cg <- cg%>%mutate(Direction2=Drt2[direction.x],
-      contrast2=paste(Direction2, contrast.x, sep="."))%>%
+   cg <- cg%>%mutate(Direction2=Drt2[direction],
+      contrast2=paste(Direction2, contrast, sep="."))%>%
       mutate(contrast2=gsub("-", "+", contrast2)) 
    ## cg$size <- rep(1,nrow(cg))
    ## cg$size[GeneRatio>=0.05&GeneRatio<0.15] <- 2
    ## cg$size[GeneRatio>=0.15] <- 3 
    #
-   cg <- cg%>%drop_na(odds)
-   fig0 <- ggplot(cg, aes(x=contrast2, y=MCls.x))+
-      geom_point(aes(size=odds, colour=p2))+
+   ## cg <- cg%>%drop_na(odds)
+   fig0 <- ggplot(cg, aes(x=contrast2, y=MCls))+
+      geom_point(aes(size=odds, colour=factor(p2)))+
       scale_x_discrete(labels=c("1.LPS"="LPS.Up", "2.LPS"="LPS.Down",
          "1.LPS+DEX"="LPS+DEX.Up", "2.LPS+DEX"="LPS+DEX.Down",
          "1.PHA"="PHA.Up", "2.PHA"="PHA.Down",
          "1.PHA+DEX"="PHA+DEX.Up", "2.PHA+DEX"="PHA+DEX.Down"))+
-      scale_colour_gradient(name="p.adjust",                           
-         low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
-         guide=guide_colourbar(order=1))+    #"#ffa500"
+      scale_colour_manual(name="p.adjust",
+          values=c("1"="grey80", "2"="red"),
+          labels=c("1"=">0.1", "2"="<0.1"),
+          guide=guide_legend(override.aes=list(size=2), order=1))+ 
+      ## scale_colour_gradient(name="p.adjust",                           
+      ##    low="blue", high="red", na.value=NA, trans="reverse", n.breaks=5,
+      ##    guide=guide_colourbar(order=1))+    #"#ffa500
       scale_size_binned("odds ratio",
+         breaks=waiver(), n.breaks=nbreak,                
          guide=guide_bins(show.limits=TRUE, axis=TRUE,
-           axis.show=arrow(length=unit(1.5,"mm"), ends="both"), order=2),
-         n.breaks=4)+
+           axis.show=arrow(length=unit(1.5,"mm"), ends="both"),
+           keywidth=grid::unit(0.4, "lines"),
+           keyheight=grid::unit(0.4, "lines"), order=2))+
       theme_bw()+
       theme(axis.title=element_blank(),
-         ## axis.text.y=element_text(size=12),
+         axis.text.y=element_text(size=9), 
+         axis.text.x=element_text(angle=-90, size=9, hjust=0, vjust=0.5), 
          legend.background=element_blank(),
-         ## legend.title=element_text(size=8),
-         ## legend.text=element_text(size=6),
-         legend.key.size=grid::unit(0.6, "lines"))
+         legend.title=element_text(size=8),
+         legend.text=element_text(size=6),
+         legend.key.size=grid::unit(0.4, "lines"))
    fig0
 }
 
@@ -271,13 +326,18 @@ tmp <- data.frame(contrast=rep(contrast, each=8),
    direction=rep(rep(c("Down", "Up"),times=4), times=4))%>%
    mutate(rn=paste(contrast, MCls, direction, sep="."))
 
-
 ###
 ###
 cg <- read_rds("./4_enrichment.outs/1_enrichGO.rds")
 
+
+
+
 ###
 ### response to LPS
+
+## mycolor <- colorRampPalette(c("blue", "red"))(3)
+
 cg2 <- cg%>%dplyr::filter(Description=="response to lipopolysaccharide")
 
 cg2 <- cg2%>%as.data.frame()%>%
@@ -290,13 +350,25 @@ cg2 <- cg2%>%
            Bg.not=Bg.total-Bg.in)
 
 cg2 <- odds.fun(cg2)
-cg2 <- cg2%>%full_join(tmp, by=c("Cluster"="rn"))
-cg2 <- cg2%>%mutate(p2=ifelse(p.adjust>0.2, NA, p.adjust))
+cg2 <- cg2%>%dplyr::select(Cluster, p.adjust, odds)%>%full_join(tmp, by=c("Cluster"="rn"))
+##
+##
+## pp <- cg2$p.adjust
+## p2 <- rep(NA, length(pp))
+## p2[pp<=0.3] <- 1
+## p2[pp<=0.1] <- 2
+## p2[pp<0.01] <- 3
+## cg2$p2 <- as.character(p2)
+cg2 <- cg2%>%mutate(p2=ifelse(p.adjust<0.1, 2, 1))
 
-fig <- ExampleGOplot(cg2)+
-   ggtitle("response to lipopolysaccharide")+
-   theme(axis.text.x=element_text(angle=-90, size=8, hjust=0, vjust=0.5),
-         plot.title=element_text(hjust=0.5, size=12))
+
+fig <- ExampleGOplot(cg2, nbreak=3)+
+    ## scale_colour_manual(name="p.adjust",
+    ##    values=c("1"=mycolor[1], "2"=mycolor[2], "3"=mycolor[3]),
+    ##    labels=c("1"="0.1~0.2", "2"="0.01~0.1", "3"="~0.01"), na.value=NA,
+    ##    guide=guide_legend(override.aes=list(size=2), order=1))+
+   ggtitle("response to LPS")+
+   theme(plot.title=element_text(hjust=0.5, size=14))
 
 figfn <-"./4_enrichment.outs/Figure3.1_response_to_LPS.png"
 png(figfn, width=550, height=400, res=120)
@@ -318,13 +390,12 @@ cg2 <- cg2%>%
            Bg.not=Bg.total-Bg.in)
 
 cg2 <- odds.fun(cg2)
-cg2 <- cg2%>%full_join(tmp, by=c("Cluster"="rn"))
-cg2 <- cg2%>%mutate(p2=ifelse(p.adjust>0.2, NA, p.adjust))
-
-fig <- ExampleGOplot(cg2)+
+cg2 <- cg2%>%dplyr::select(Cluster, p.adjust, odds)%>%full_join(tmp, by=c("Cluster"="rn"))
+cg2 <- cg2%>%mutate(p2=ifelse(p.adjust<0.1, 2, 1))
+###
+fig <- ExampleGOplot(cg2, nbreak=3)+
    ggtitle("Type I IFN signaling")+
-   theme(axis.text.x=element_text(angle=-90, size=8, hjust=0, vjust=0.5),
-         plot.title=element_text(hjust=0.5, size=12))
+   theme(plot.title=element_text(hjust=0.5, size=14))
 
 figfn <-"./4_enrichment.outs/Figure3.2_IFN.png"
 png(figfn, width=550, height=400, res=120)
