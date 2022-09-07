@@ -82,7 +82,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Effects of glucocorticoids on gene transcription, https://www.sciencedirect.com/science/article/pii/S0014299904007204?via%3Dihub
 - https://www.sciencedirect.com/science/article/pii/S0888754321003554
 - Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
-
+- IL-1 receptor 2 (IL-1R2) and its role in immune regulation, https://www.sciencedirect.com/science/article/pii/S0889159112004928?via%3Dihub
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
