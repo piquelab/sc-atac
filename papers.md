@@ -66,6 +66,7 @@ https://www.nature.com/articles/s41590-022-01229-8
 - Nonparametric single-cell multiomic characterization of trio relationships between transcription factors, target genes, and cis-regulatory regions, 
 https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author#!
 - Multiscale 3D genome organization underlies ILC2 ontogenesis and allergic airway inflammation, (https://www.nature.com/articles/s41590-022-01295-y)
+- Effect of genomic and cellular environments on gene expression noise, https://www.biorxiv.org/content/10.1101/2022.08.31.506082v1.full
 
 
 #### biology function
