@@ -71,6 +71,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
 - A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
 - A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
+- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
 
 
 #### biology function
