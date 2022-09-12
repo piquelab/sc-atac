@@ -89,6 +89,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - https://www.sciencedirect.com/science/article/pii/S0888754321003554
 - Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
 - IL-1 receptor 2 (IL-1R2) and its role in immune regulation, https://www.sciencedirect.com/science/article/pii/S0889159112004928?via%3Dihub
+- A General Introduction to Glucocorticoid Biology, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01545/full
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
