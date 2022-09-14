@@ -74,7 +74,8 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
 - Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
 - Enhanced transcriptional heterogeneity mediated by NF-κB super-enhancers, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010235
-
+- Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
+- Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
