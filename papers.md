@@ -34,7 +34,8 @@
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
 - Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 - Changes in chromatin accessibility are not concordant with transcriptional changes for single-factor perturbations, https://www.biorxiv.org/content/10.1101/2022.02.03.478981v1
-- Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, https://www.biorxiv.org/content/10.1101/2021.05.10.443466v1
+- Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, 
+(https://www.nature.com/articles/s41588-022-01168-y.epdf?sharing_token=1KKJ7YeLKpeJVr6Ql7MZwNRgN0jAjWel9jnR3ZoTv0PLpoELh0eC1drpuSxF7oFvSFt1xWHMb_DzPhH4WzuFgzcI7MTHS1OCVBGLX_h8QLZ99rHZ-W4PGy3Y7Z80zbh5MJfXF_A4i3AnkBPBvk2PZpWWi3XPJ_iPmEOG3hcVHPc%3D)
 - Noncoding genetic variation in GATA3 increases acute lymphoblastic leukemia risk through local and global changes in chromatin conformation, https://www.nature.com/articles/s41588-021-00993-x
 - Chromatin and gene-regulatory dynamics of the developing human cerebral cortex at single-cell resolution, https://www.cell.com/cell/fulltext/S0092-8674(21)00942-9#%20
 - Integrative analysis of liver-specific non-coding regulatory SNPs associated with the risk of coronary artery disease, https://www.cell.com/ajhg/fulltext/S0002-9297(21)00048-3?dgcid=STMJ_1646393491_SC&utm_campaign=Society%3A%20AJHG&utm_content=200495625&utm_medium=social&utm_source=twitter&hss_channel=tw-18477428
