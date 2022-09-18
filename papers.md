@@ -76,6 +76,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Enhanced transcriptional heterogeneity mediated by NF-κB super-enhancers, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010235
 - Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
+- Transcriptional risk scores link GWAS to eQTLs and predict complications in Crohn's disease, https://www.nature.com/articles/ng.3936 
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
