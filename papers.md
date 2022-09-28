@@ -34,7 +34,8 @@
 - Regulatory genomic circuitry of human disease loci by integrative epigenomics, https://www.nature.com/articles/s41586-020-03145-z
 - Systematic analysis of binding of transcription factors to noncoding variants, https://www.nature.com/articles/s41586-021-03211-0
 - Changes in chromatin accessibility are not concordant with transcriptional changes for single-factor perturbations, https://www.biorxiv.org/content/10.1101/2022.02.03.478981v1
-- Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, https://www.biorxiv.org/content/10.1101/2021.05.10.443466v1
+- Genetic determinants of chromatin reveal prostate cancer risk mediated by context-dependent gene regulation, 
+(https://www.nature.com/articles/s41588-022-01168-y)
 - Noncoding genetic variation in GATA3 increases acute lymphoblastic leukemia risk through local and global changes in chromatin conformation, https://www.nature.com/articles/s41588-021-00993-x
 - Chromatin and gene-regulatory dynamics of the developing human cerebral cortex at single-cell resolution, https://www.cell.com/cell/fulltext/S0092-8674(21)00942-9#%20
 - Integrative analysis of liver-specific non-coding regulatory SNPs associated with the risk of coronary artery disease, https://www.cell.com/ajhg/fulltext/S0002-9297(21)00048-3?dgcid=STMJ_1646393491_SC&utm_campaign=Society%3A%20AJHG&utm_content=200495625&utm_medium=social&utm_source=twitter&hss_channel=tw-18477428
@@ -66,7 +67,16 @@ https://www.nature.com/articles/s41590-022-01229-8
 - Nonparametric single-cell multiomic characterization of trio relationships between transcription factors, target genes, and cis-regulatory regions, 
 https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author#!
 - Multiscale 3D genome organization underlies ILC2 ontogenesis and allergic airway inflammation, (https://www.nature.com/articles/s41590-022-01295-y)
-
+- Effect of genomic and cellular environments on gene expression noise, https://www.biorxiv.org/content/10.1101/2022.08.31.506082v1.full
+- Shared and distinct genetic risk factors for childhood-onset and adult-onset asthma: genome-wide and transcriptome-wide studies, https://www.clinicalkey.com/#!/content/playContent/1-s2.0-S2213260019300554?returnurl=https:%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2213260019300554%3Fshowall%3Dtrue&referrer=https:%2F%2Fpubmed.ncbi.nlm.nih.gov%2F
+- Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
+- A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
+- A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
+- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
+- Enhanced transcriptional heterogeneity mediated by NF-κB super-enhancers, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010235
+- Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
+- Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
+- Transcriptional risk scores link GWAS to eQTLs and predict complications in Crohn's disease, https://www.nature.com/articles/ng.3936 
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -82,7 +92,8 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Effects of glucocorticoids on gene transcription, https://www.sciencedirect.com/science/article/pii/S0014299904007204?via%3Dihub
 - https://www.sciencedirect.com/science/article/pii/S0888754321003554
 - Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
-
+- IL-1 receptor 2 (IL-1R2) and its role in immune regulation, https://www.sciencedirect.com/science/article/pii/S0889159112004928?via%3Dihub
+- A General Introduction to Glucocorticoid Biology, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01545/full
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
