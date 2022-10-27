@@ -81,7 +81,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Psychosocial experiences modulate asthma-associated genes through geneenvironment interactions, https://elifesciences.org/articles/63852.pdf
 - Single-Cell Epigenomics and Functional Fine-Mapping of Atherosclerosis GWAS Loci, https://www.ahajournals.org/doi/10.1161/CIRCRESAHA.121.318971
 - Limited overlap of eQTLs and GWAS hits due to systematic differences in discovery, https://www.biorxiv.org/content/10.1101/2022.05.07.491045v1
-
+- African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
