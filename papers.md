@@ -78,6 +78,11 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
 - Transcriptional risk scores link GWAS to eQTLs and predict complications in Crohn's disease, https://www.nature.com/articles/ng.3936 
+- Psychosocial experiences modulate asthma-associated genes through geneenvironment interactions, https://elifesciences.org/articles/63852.pdf
+- Single-Cell Epigenomics and Functional Fine-Mapping of Atherosclerosis GWAS Loci, https://www.ahajournals.org/doi/10.1161/CIRCRESAHA.121.318971
+- Limited overlap of eQTLs and GWAS hits due to systematic differences in discovery, https://www.biorxiv.org/content/10.1101/2022.05.07.491045v1
+- African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
+- Tissue-specific enhancer-gene maps from multimodal single-cell data identify causal disease alleles, https://www.medrxiv.org/content/10.1101/2022.10.27.22281574v1
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
