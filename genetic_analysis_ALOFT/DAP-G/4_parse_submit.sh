@@ -4,7 +4,7 @@
 condition=ALOFT
 
 echo ${condition}
-dir=./dap-g_outs/dap-g_dtss/${condition}
+dir=./dap-g_outs/dap-g_combineNew_Union/${condition}
 
 
 cat geneList_files.txt | \

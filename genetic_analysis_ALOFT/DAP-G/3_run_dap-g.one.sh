@@ -7,24 +7,17 @@
 #SBATCH -n 4
 
 
-
-### Tcell annotation
-# outdir="./dap-g_outs/dap-g_peak_union/${condition}"
-# if [ ! -d ${outdir} ]; then
-#    mkdir -p ${outdir}
-# fi
-
-# prefix_prior=../torus/torus_output/torus_peak_union/${condition}_dump.prior
-
+###
+### different SNP annotation
 
 ###
 ### dtss annotation
-outdir="./dap-g_outs/dap-g_dtss/${condition}"
+outdir="./dap-g_outs/dap-g_combineNew_Union/${condition}"
 if [ ! -d ${outdir} ]; then
    mkdir -p ${outdir}
 fi
 
-prefix_prior=../torus/torus_output/torus_dtss/${condition}_dump.prior
+prefix_prior=../torus/torus_output/torus_peak_combineNew/${condition}_Union_dump.prior
 
 
 cat ./geneList/${geneFile} | \
