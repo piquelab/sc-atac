@@ -138,7 +138,8 @@ myDE <- function(y, X, gene){
 
    ## linear regression
    x1 <- X[,1]
-   lm0 <- try(lm(y~0+x1), silent=T)
+   x2 <- X[,2] 
+   lm0 <- try(lm(y~0+x1+x2), silent=T)
 
    if ( (class(lm0)!="try-error")){
       b <- coef(lm0)
@@ -183,7 +184,7 @@ res <- map_dfr(MCls, function(oneMCl){
 
    cvti <- cvt%>%dplyr::filter(MCls==oneMCl)
    mati <- mat[,cvti$bti]
-   X <- data.frame(x1=cvti$treat)
+   X <- data.frame(x1=cvti$treat, x2=cvti$sampleID)
    rn <- rownames(mati)
    TMP <- mclapply(rn, function(ii){
      y <- mati[ii,]
@@ -204,11 +205,14 @@ res2 <- res%>%group_by(MCls, contrast)%>%
 atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
 motif <- Motifs(atac)
 x <- unlist(motif@motif.names)
+motif.name <- x
+motif.id <- names(x)
+names(motif.id) <- motif.name
 
-res2 <- res2%>%mutate(motif=x[gene])
+res2 <- res2%>%mutate(motif=motif.id[gene])
     
 ###
-opfn <- "./2_motif.activities.outs/3_motif.diff.results.rds"
+opfn <- "./2_motif.activities.outs/3.2_indi_motif.diff.results.rds"
 write_rds(res2, opfn)
 
 
@@ -237,7 +241,7 @@ res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
 ##     filter(motif%in%topmotif, fold.enrichment>1.41, qvalue.fisher<0.1)%>%
 ##     dplyr::pull(motif.name)%>%unique()
 
-sigs <- res%>%dplyr::filter(qval<0.1,abs(beta)>1.41)%>%
+sigs <- res%>%dplyr::filter(qval<0.1)%>% ##,abs(beta)>1.41)%>%
    group_by(MCls, contrast)%>%
    summarise(ny=n(), .groups="drop")
 
@@ -251,7 +255,7 @@ res <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))
 condition <- sort(unique(res$condition))
 mat <- map_dfc(condition, function(ii){
    res2 <- res%>%dplyr::filter(condition==ii)
-   b <- res2$beta
+   b <- res2$beta ##/res2$stderr
    names(b) <- res2$motif
    b[topmotif]
 })
@@ -259,38 +263,63 @@ mat <- as.matrix(mat)
 colnames(mat) <- condition
 rownames(mat) <- topmotif
 
+
+res2 <- res%>%dplyr::filter(motif%in%topmotif)%>%mutate(is_sig=ifelse(qval<0.1, 1, 0))
+imat <- res2%>%pivot_wider(id_cols=motif, names_from=condition, values_from=is_sig)
+imat2 <- as.matrix(imat[,-1])
+rownames(imat2) <- as.character(imat$motif)
+imat2 <- imat2[topmotif,]
+
+
 ###
 ###
 ## condition2 <- c("Bcell_"
 
-b <- as.vector(mat)
-breaks <- quantile(b, probs=seq(0, 1, length.out=100),na.rm=T)
+## b <- as.vector(mat)
+
+
+mat2 <- mat*imat2
+colnames(mat2) <- gsub("-", "+", colnames(mat2))
+
+b <- as.vector(mat2)
+b0 <- quantile(b[b<0], probs=seq(0, 1, length.out=49))
+b1 <- 0
+b2 <- quantile(b[b>0], probs=seq(0, 1, length.out=49))
+breaks <- c(b0, b1, b2)
+
+## breaks <- quantile(b, probs=seq(0, 1, length.out=100),na.rm=T)
+ 
 col_fun <-  colorRamp2(breaks,
-   colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(100))
+   colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(99))
+
 column_ha <- HeatmapAnnotation(
    celltype=gsub("_.*", "", condition),
-   treatment=gsub(".*_", "", condition),
+   contrast=gsub("-", "+", gsub(".*_", "", condition)),
    col=list(
       celltype=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
                  "NKcell"="#aa4b56", "Tcell"="#ffaa00"),
-      treatment=c("LPS"="#fb9a99", "LPS-DEX"="#e31a1c",
-                  "PHA"="#a6cee3", "PHA-DEX"="#1f78b4")))
-
-fig <- Heatmap(mat, col=col_fun,
+      contrast=c("LPS"="#fb9a99", "LPS+DEX"="#e31a1c",
+                  "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")),
+   annotation_legend_param=list(celltype=list(labels_gp=gpar(fontsize=8)),
+                                contrast=list(labels_gp=gpar(fontsize=8))))
+ 
+fig <- Heatmap(mat2, col=col_fun,
    cluster_rows=T, cluster_columns=T,
-   show_row_dend=F, show_column_dend=T,
+   show_row_dend=T,  show_column_dend=T,
    top_annotation=column_ha,
    heatmap_legend_param=list(title="Diff motif",
-      title_gp=gpar(fontsize=10),
-      labels_gp=gpar(fontsize=10)),
+      title_gp=gpar(fontsize=10, font=2),
+      labels_gp=gpar(fontsize=10),
+      legend_height=grid::unit(4, "cm"),
+      grid_width=grid::unit(0.4, "cm")),
    show_row_names=T, show_column_names=T,
-   row_names_side="left",
-   column_names_gp=gpar(fontsize=9),
-   row_names_gp=gpar(fontsize=7),
+   ##row_names_side="left",
+   column_names_gp=gpar(fontsize=10),
+   row_names_gp=gpar(fontsize=8),
    use_raster=F, raster_device="png")
  
 figfn <- "./2_motif.activities.outs/Figure1.2_heatmap.motif.activities.png"
-png(figfn, height=800, width=750, res=120)
+png(figfn, height=850, width=800, res=120)
 set.seed(0)
 fig <- draw(fig)
 dev.off()
@@ -360,62 +389,97 @@ opfn <- paste(outdir, "4.2_response.motif.positive.rds", sep="")
 write_rds(motif_response, opfn)
 
 
+
+
 ##################################
 ### define  response motif (1) ###
 ##################################
 
-## rm(list=ls())
+rm(list=ls())
 
-## outdir <- "./2_motif.activities.outs/"
-
-## res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
-
-## ##
-## ii <- 4
-## oneMCl <- "Tcell"
-## res2 <- res%>%filter(MCls==oneMCl)
-
-## th0 <- quantile(abs(res2$beta),probs=0.9)
-## ## th0 <- 0.21
-## ### CTRL
-## res3 <- res2%>%filter(contrast=="LPS"|contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
-##     arrange(desc(abs(beta)))
-## opfn <- paste(outdir, "5_", ii, "_",  oneMCl, "_CTRL.motif.txt", sep="")
-## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-## length(unique(res3$gene))
-
-## ### LPS-EtOH
-## res3 <- res2%>%filter(contrast=="LPS", qval<0.1, abs(beta)>th0)%>%
-##     arrange(desc(abs(beta)))
-## opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-EtOH.motif.txt", sep="")
-## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-## length(unique(res3$gene))
+outdir <- "./2_motif.activities.outs/MotifList/"
+if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 
-## ### LPS-DEX
-## res3 <- res2%>%filter(contrast=="LPS-DEX", qval<0.1, abs(beta)>th0)%>%
-##     arrange(desc(abs(beta)))
-## opfn <- paste(outdir, "5_",  ii, "_", oneMCl, "_LPS-DEX.motif.txt", sep="")
-## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-## length(unique(res3$gene)) 
+res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+res <- res%>%mutate(comb=paste(MCls, contrast, sep="_"))
+
+###########################################
+### conditions separately define motifs ###
+###########################################
+
+conditions <- sort(unique(res$comb))
+for (ii in conditions){
+   ###
+   oneMCl <- gsub("_.*", "", ii)
+   res2 <- res%>%filter(MCls==oneMCl)
+    
+   if( oneMCl!="Monocyte"){ 
+      th0 <- quantile(abs(res2$beta), probs=0.9)
+   }else{   
+      th0 <- quantile(abs(res$beta),probs=0.9)
+   }
+    
+   ##
+   motifs <- res%>%filter(comb==ii, qval<0.1, abs(beta)>th0)%>%pull(gene)%>%unique()
+   opfn <- paste(outdir, "1_comb_", ii, "_motif.txt", sep="") 
+   write.table(motifs, opfn, row.names=F, quote=F, col.names=F)
+   ## 
+   cat(ii, length(motifs), "\n")
+}
 
 
-## ### PHA-EtOH
-## res3 <- res2%>%filter(contrast=="PHA", qval<0.1, abs(beta)>th0)%>%
-##     arrange(desc(abs(beta)))
-## opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-EtOH.motif.txt", sep="")
-## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-## length(unique(res3$gene))
 
+#######################################################
+### for contrast union of motifs across cell-types  ###
+#######################################################
+ 
+contrast <- sort(unique(res$contrast))
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+for (ii in contrast){
+    
+   ###
+   motifs <- lapply(MCls, function(oneMCl){
+   ##
+     comb <- paste(oneMCl, ii, sep="_")
+     fn <- paste(outdir, "1_comb_", comb, "_motif.txt", sep="")
+     x <- read.table(fn)$V1
+     x
+  })
+  motifs <- unique(unlist(motifs))
+    
+  ###
+  opfn <- paste(outdir, "2_treats_", ii, "_motif.txt", sep="") 
+  write.table(motifs, opfn, row.names=F, quote=F, col.names=F)
+  ## 
+  cat(ii, length(motifs), "\n")
+}
 
-## ### PHA-DEX
-## res3 <- res2%>%filter(contrast=="PHA-DEX", qval<0.1, abs(beta)>th0)%>%
-##     arrange(desc(abs(beta)))
-## opfn <- paste(outdir, "5_", ii, "_", oneMCl, "_PHA-DEX.motif.txt", sep="")
-## write.table(unique(res3$gene), opfn, row.names=F, quote=F, col.names=F)
-## length(unique(res3$gene))
+###################################################
+### For each cell-type union of response motifs ###
+###################################################
 
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+for (i in 1:4){
+   ##
+   oneMCl <- MCls[i]
+   res2 <- res%>%filter(MCls==oneMCl)
+   ## 
+   if( oneMCl!="Monocyte"){ 
+      th0 <- quantile(abs(res2$beta),probs=0.9)
+   }else{   
+      th0 <- quantile(abs(res$beta),probs=0.9)
+   }
+   ## 
+   motifs <- res2%>%
+       filter(qval<0.1, abs(beta)>th0)%>%pull(gene)%>%unique()
+   ##
+   opfn <- paste(outdir, "3_MCls_", oneMCl, "_union.motif.txt", sep="")
+   write.table(motifs, opfn, row.names=F, quote=F, col.names=F)
 
+   ##
+   cat(oneMCl, th0, length(motifs), "\n")
+}
 
 
 ##################################
@@ -528,3 +592,126 @@ for (i in 1:4){
 ##    mutate(treat=gsub(".*-ATAC-|_.*", "", NEW_BARCODE),
 ##           bti=paste(MCls, treat, SNG.BEST.GUESS, sep="_"))%>%
 ##    dplyr::select(NEW_BARCODE, bti) 
+
+
+###
+### Differential activities results
+resMotif <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")%>%
+    mutate(conditions=paste(MCls, contrast, sep="_"))
+### threshold
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+ths <- sapply(1:4, function(i){
+   ##
+   oneMCl <- MCls[i]
+   res <- resMotif
+   res2 <- res%>%filter(MCls==oneMCl) 
+   if( oneMCl!="Monocyte"){ 
+      th0 <- quantile(abs(res2$beta),probs=0.9)
+   }else{   
+      th0 <- quantile(abs(res$beta),probs=0.9)
+   }
+   th0
+})
+names(ths) <- MCls
+
+### motif id and name    
+motif_DF <- res%>%dplyr::select(gene, motif)%>%distinct(gene, .keep_all=T)
+
+###
+### motif occupancy 
+## atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
+X <- read_rds("./1.3_motif.outs/0_motif.rds")
+
+###
+###
+anno <- read_rds("../2_Differential/2.2_compareRNAandATAC.outs/2_annot.ChIPseeker.rds")%>%
+   as.data.frame()%>%
+   mutate(peak=paste(gsub("chr", "", seqnames), start, end, sep="-"))
+anno2 <- anno%>%dplyr::select(peak, geneId)
+
+###
+### DEG
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/6_DEG.CelltypeNew_output/Filter2/2_meta.rds"
+resDG <- read_rds(fn)%>%mutate(conditions=paste(MCls, contrast, sep="_"))
+resDG <- resDG%>%dplyr::filter(qval<0.1, abs(beta)>0.5)
+
+
+###
+### DVG
+fn <- "/nfs/rprdata/julong/SCAIP/analyses/SCAIP-B1-6_2020.03.23/10_RNA.Variance_output/tmp9/3_phiNew.meta"
+resDV <- read.table(fn, header=T)%>%mutate(conditions=paste(MCls, contrast, sep="_"))
+resDV <- resDV%>%dplyr::filter(qval<0.1, abs(beta)>0.5)
+
+
+###
+#### DARs
+fn <- "../2_Differential/1.3_DiffPeak.outs/3.0_DESeq_indi.results.rds"
+resDA <- read_rds(fn)%>%mutate(conditions=paste(MCls, contrast, sep="_"))%>%as.data.frame()
+resDA <- resDA%>%dplyr::filter(p.adjusted<0.1, abs(estimate)>0.5)
+
+
+###
+### summary number of motifs
+conditions <- sort(unique(resMotif$conditions))
+###
+motif_DF <- map_dfr(1:length(conditions), function(i){
+   ###
+   condition <- conditions[i]
+   oneMCl <- gsub("_.*", "", condition)
+   ##
+   cat(condition, "\n") 
+   res2 <- resMotif%>%filter(conditions==condition, abs(beta)>ths[oneMCl])
+   resDG2 <- resDG%>%filter(conditions==condition)
+   resDV2 <- resDV%>%filter(conditions==condition) 
+   resDA2 <- resDA%>%filter(conditions==condition)
+    
+   ##
+   motif_DF2 <- map_dfr(1:nrow(res2), function(k){
+      ##
+      id <- res2[k,"gene"]
+      motif.name <-  res2[k, "motif"]
+      ### 
+      peak_motif <- rownames(X)[X[,id]==1]
+      peak_DA <- resDA2$gene 
+      gene_motif <- anno2%>%filter(peak%in%peak_motif, peak%in%peak_DA)%>%pull(geneId)%>%unique()
+      ###
+      tmp <- data.frame(motif.id=id, motif=motif.name,
+                        n_DEG=sum(gene_motif%in%resDG2$gene), n_DVG=sum(gene_motif%in%resDV2$gene))
+      tmp
+   })    
+   ##
+   motif_DF2$conditions <- condition
+   motif_DF2 
+})
+
+
+###
+###
+x1 <- motif_DF%>%group_by(conditions)%>%
+    summarise(nmotif=n(),.groups="drop")%>%as.data.frame()
+
+x2 <- motif_DF%>%filter(n_DEG>0, n_DVG==0)%>%group_by(conditions)%>%
+    summarise(nmotif_DEGonly=n(),.groups="drop")%>%as.data.frame()
+
+x3 <- motif_DF%>%filter(n_DEG==0, n_DVG>0)%>%group_by(conditions)%>%
+    summarise(nmotif_DVGonly=n(),.groups="drop")%>%as.data.frame()
+ 
+x4 <- motif_DF%>%filter(n_DEG>0, n_DVG>0)%>%group_by(conditions)%>%
+    summarise(nmotif_DGboth=n(),.groups="drop")%>%as.data.frame()
+
+##
+DF_summ <- x1%>%left_join(x2, by="conditions")%>%
+    left_join(x3, by="conditions")%>%
+    left_join(x4, by="conditions")%>%
+    mutate(nmotif_DEGonly=ifelse(is.na(nmotif_DEGonly), 0, nmotif_DEGonly),
+           nmotif_DVGonly=ifelse(is.na(nmotif_DVGonly), 0, nmotif_DVGonly),
+           nmotif_DGboth=ifelse(is.na(nmotif_DGboth), 0, nmotif_DGboth))
+##
+## opfn <- "./2_motif.activities.outs/8_motifs.xlsx"
+## openxlsx::write.xlsx(DF_summ, opfn, overwrite=T)
+opfn <- "./2_motif.activities.outs/8_motifs.csv"
+write.csv(DF_summ, opfn, row.names=F)
+    
+
+
+
