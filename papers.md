@@ -83,6 +83,7 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Limited overlap of eQTLs and GWAS hits due to systematic differences in discovery, https://www.biorxiv.org/content/10.1101/2022.05.07.491045v1
 - African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
 - Tissue-specific enhancer-gene maps from multimodal single-cell data identify causal disease alleles, https://www.medrxiv.org/content/10.1101/2022.10.27.22281574v1
+- Environmental and genetic drivers of population differences in SARS-CoV2 2 immune responses, https://www.biorxiv.org/content/10.1101/2022.11.22.517073v1.full.pdf
 
 #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
