@@ -88,7 +88,10 @@ https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs,
 https://www.nature.com/articles/s41588-018-0089-9
 - Optimizing expression quantitative trait locus mapping workflows for single-cell studies,https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02407-x
-
+- Science Forum: The single-cell eQTLGen consortium, https://elifesciences.org/articles/52155
+- Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
+- Identification of context-dependent expression quantitative trait loci in whole blood, [
+https://www.nature.com/articles/ng.3737
 
 
 #### biology function
