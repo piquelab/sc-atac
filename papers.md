@@ -92,9 +92,10 @@ https://www.nature.com/articles/s41588-018-0089-9
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
 - Identification of context-dependent expression quantitative trait loci in whole blood, [
 https://www.nature.com/articles/ng.3737
+- Single cell eQTL analysis identifies cell type-specific genetic control of gene expression in fibroblasts and reprogrammed induced pluripotent stem cells, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02293-3
 
 
-#### biology function
+- #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
 - Regulation of type I interferon responses, https://www.nature.com/articles/nri3581
 - A Functional Genomics Approach to Understand Variation in Cytokine Production in Humans, https://pubmed.ncbi.nlm.nih.gov/27814507/
