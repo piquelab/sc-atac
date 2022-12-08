@@ -10,7 +10,7 @@ if (length(args)>0){
    oneMCl <- args[2]
  }else{
    motifFile <- "splitMotif000"
-   oneMCl <- "Bcell"
+   oneMCl <- "comb"
 }
  
 outdir <- paste("./torus_input/Motif_", oneMCl, "/", sep="")
@@ -36,15 +36,17 @@ for (i in 1:length(motifList)){
    cat(i, motif, "\n")
     
    ###
-   fn <- paste("../SNPannotation/4_SNPAnnot.outs/pct_0.02_", oneMCl, "/", motif, "_union_torus.annot.gz", sep="")
+   ## fn <- paste("../SNPannotation/4_SNPAnnot.outs/pct_0.02_", oneMCl, "/", motif, "_union_torus.annot.gz", sep="")
+   fn <- paste("../SNPannotation/5_SNPAnnot.outs/pct_0.02_", oneMCl, "/", motif, "_torus.annot.gz", sep="") 
    if ( file.exists(fn)){
       ### 
       annot <- fread(fn, header=T, data.table=F) 
       annot2 <- annot%>%filter(SNP%in%bed$V4)%>%mutate(chr_pos_grch38=chr_pos[as.character(SNP)]) 
-      annot2 <- annot2%>%dplyr::select(chr_pos_grch38, peaking_d)%>%dplyr::rename(SNP=chr_pos_grch38) 
+      annot2 <- annot2%>%dplyr::select(chr_pos_grch38, peaking_d, motif_d)%>%dplyr::rename(SNP=chr_pos_grch38) 
+      annot3 <- annot2%>%dplyr::select(SNP, peaking_d=motif_d)
       ###
-      gfn <- gzfile(paste(outdir, motif, "_union_torus.annot.gz", sep=""))
-      write.table(annot2, gfn, row.names=F, quote=F, sep="\t", col.names=T)
+      gfn <- gzfile(paste(outdir, motif, "_torus.annot.gz", sep=""))
+      write.table(annot3, gfn, row.names=F, quote=F, sep="\t", col.names=T)
       ###
    }    
 }

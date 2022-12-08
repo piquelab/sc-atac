@@ -3,10 +3,11 @@
 
 cd $PWD
  
-# oneMCl="Tcell"
 
-for oneMCl in Bcell Monocyte NKcell Tcell; do
+##for oneMCl in Bcell Monocyte NKcell Tcell; do
 
+##for oneMCl in comb comb2; do
+oneMCl=comb2
 cat motif_split.txt |
 while read motifFile; do
    sbatch -q express -p erprp --mem=20G --time=1-00:00:00 -N 1-1 -n 1 --output=slurm_${oneMCl}_${motifFile}.output --wrap "
@@ -16,4 +17,4 @@ while read motifFile; do
    sleep 1;
 done 
 
-done
+##done
