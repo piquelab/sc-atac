@@ -95,6 +95,8 @@ https://www.nature.com/articles/ng.3737
 - Single cell eQTL analysis identifies cell type-specific genetic control of gene expression in fibroblasts and reprogrammed induced pluripotent stem cells, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02293-3
 - Altered and allele-specific open chromatin landscape reveals epigenetic and genetic regulators of innate immunity in COVID-19,
 https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
+- Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
+
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -112,6 +114,8 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Regulating IRFs in IFN Driven Disease, https://www.frontiersin.org/articles/10.3389/fimmu.2019.00325/full
 - IL-1 receptor 2 (IL-1R2) and its role in immune regulation, https://www.sciencedirect.com/science/article/pii/S0889159112004928?via%3Dihub
 - A General Introduction to Glucocorticoid Biology, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01545/full
+
+
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
