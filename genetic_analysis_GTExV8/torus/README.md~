@@ -1,0 +1,6 @@
+### copy eQTL files
+summary data are from `cp /wsu/home/groups/piquelab/gtex_v8/Data/summary_data/Artery_Aorta.allpairs.txt.gz .`
+Obtain SNP list by `zcat Artery_Aorta.allpairs.txt.gz |grep -v gene |cut -f 2 |sort|uniq > Aorta.snpList.txt &`
+Annotation files `FUNGEI_anno.hg38.liftover.gz` made from Anthony `./relax_thresh/FUNGEI_anno.toMake_hg38` <br/>
+A total of  10,331,181 SNPs are included in GTEx_V8 and Anthony annotation motifs snps contained  3,401,115.
+ 
