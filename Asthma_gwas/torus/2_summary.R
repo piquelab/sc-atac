@@ -31,12 +31,12 @@ est2 <- est2%>%mutate(category2=fct_reorder(category, order))
 col2 <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3","NKcell"="#aa4b56", "Tcell"="#ffaa00",
   "LPS"="#fb9a99", "LPS-DEX"="#e31a1c", "PHA"="#a6cee3", "PHA-DEX"="#1f78b4", "peaking"="#e7298a")
 
-p2 <- ggplot(est2, aes(x=odds, y=category2, color=factor(gr)))+
+p1 <- ggplot(est2, aes(x=odds, y=category2, color=factor(gr)))+
     geom_errorbarh(aes(xmax=CI_upper, xmin=CI_lower), size=0.5, height=0.2)+
     geom_point(shape=19, size=0.5)+
     geom_vline(aes(xintercept=0), size=0.25, linetype="dashed")+
     ##scale_y_discrete(labels=ylab)+
-    scale_x_continuous("log odds ratio", breaks=seq(-4, 8, by=2), limits=c(-5, 8))+
+    scale_x_continuous("log odds ratio", breaks=seq(-4, 6, by=2), limits=c(-5, 7))+
     scale_colour_manual(values=col2)+
     theme_bw()+
     theme(legend.title=element_blank(),
@@ -48,9 +48,9 @@ p2 <- ggplot(est2, aes(x=odds, y=category2, color=factor(gr)))+
           ## axis.text.x=element_text(size=9, angle=-90, hjust=0, vjust=0.5),
           ###axis.text=element_text(size=9))
  
-figfn <- paste(outdir, "Figure2.1_combine2_all_annot.est.png", sep="")
+figfn <- paste(outdir, "Figure1.1_combine2_annot.est.png", sep="")
 png(figfn, width=520, height=500, res=120)
-p2
+p1
 dev.off()
 
 
@@ -58,18 +58,18 @@ dev.off()
 ### 2. peaks, cell-type motifs and response motifs ###
 ######################################################
 
-fn <- "./torus_output/Combine/Asthma_Union.est"
+fn <- "./torus_output/Combine/Asthma_Union_all.est"
 est <- read.table(fn)
 est2 <- est[2:4,]
 est2 <- est2%>%mutate(order=as.numeric(1:nrow(est2)))%>%
    dplyr::rename("peaking_d"="V1", "odds"="V2", "CI_lower"="V3", "CI_upper"="V4")
 
-p3 <- ggplot(est2, aes(x=odds, y=as.character(order), color=factor(order)))+
+p2 <- ggplot(est2, aes(x=odds, y=as.character(order), color=factor(order)))+
     geom_errorbarh(aes(xmax=CI_upper, xmin=CI_lower), size=0.5, height=0.2)+
     geom_point(shape=19, size=0.5)+
     geom_vline(aes(xintercept=0), size=0.25, linetype="dashed")+
     scale_y_discrete(labels=c("1"="Peaks", "2"="Cell-type motifs", "3"="Treatment motifs"))+
-    scale_x_continuous("log odds ratio", breaks=seq(-2,6,by=2), limits=c(-2, 6))+
+    scale_x_continuous("log odds ratio", breaks=seq(-2,6,by=2), limits=c(-2, 7))+
     scale_colour_manual(values=c("1"="#7570b3", "2"="#1b9e77", "3"="#e7298a"),
        labels=c("1"="Peaks", "2"="Cell-type motifs", "3"="Treatment motifs"))+
     theme_bw()+
@@ -84,7 +84,7 @@ p3 <- ggplot(est2, aes(x=odds, y=as.character(order), color=factor(order)))+
  
 figfn <- paste(outdir, "Figure1.2_union_annot.est.png", sep="")
 png(figfn, width=480, height=300, res=120)
-p3
+p2
 dev.off()
 
 
