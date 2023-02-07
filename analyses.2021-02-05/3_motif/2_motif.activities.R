@@ -33,7 +33,7 @@ rm(list=ls())
 ###
 outdir <- "./2_motif.activities.outs/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
-
+ 
 ##
 ### calculate motif
 fn <- "./1_motif.outs/1_scATAC.motif.rds"
@@ -217,6 +217,12 @@ write_rds(res2, opfn)
 
 
 
+
+###
+### Heatmap for publication 
+
+
+
 ########################################
 ### show heatmap ofsignificant motif ###
 ########################################
@@ -250,6 +256,7 @@ topmotif <- res%>%
    dplyr::pull(motif)
 topmotif <- sort(unique(topmotif))
 
+
 ### data for heatmap
 res <- res%>%mutate(condition=paste(MCls, contrast, sep="_"))
 condition <- sort(unique(res$condition))
@@ -262,8 +269,9 @@ mat <- map_dfc(condition, function(ii){
 mat <- as.matrix(mat)
 colnames(mat) <- condition
 rownames(mat) <- topmotif
-
-
+ 
+###
+###
 res2 <- res%>%dplyr::filter(motif%in%topmotif)%>%mutate(is_sig=ifelse(qval<0.1, 1, 0))
 imat <- res2%>%pivot_wider(id_cols=motif, names_from=condition, values_from=is_sig)
 imat2 <- as.matrix(imat[,-1])
@@ -271,15 +279,29 @@ rownames(imat2) <- as.character(imat$motif)
 imat2 <- imat2[topmotif,]
 
 
-###
-###
-## condition2 <- c("Bcell_"
 
 ## b <- as.vector(mat)
-
-
 mat2 <- mat*imat2
 colnames(mat2) <- gsub("-", "+", colnames(mat2))
+
+
+condition2 <- c("Bcell_LPS", "Bcell_PHA", "Monocyte_LPS", "Monocyte_PHA",
+                "NKcell_LPS", "NKcell_PHA", "Tcell_LPS", "Tcell_PHA",
+               "Bcell_LPS+DEX", "Bcell_PHA+DEX", "Monocyte_LPS+DEX", "Monocyte_PHA+DEX",
+                "NKcell_LPS+DEX", "NKcell_PHA+DEX", "Tcell_LPS+DEX", "Tcell_PHA+DEX")
+
+## condition2 <- c("Bcell_LPS", "Bcell_PHA", "Bcell_LPS+DEX", "Bcell_PHA+DEX",
+##                  "Monocyte_LPS", "Monocyte_PHA","Monocyte_LPS+DEX", "Monocyte_PHA+DEX",
+##                  "NKcell_LPS", "NKcell_PHA", "NKcell_LPS+DEX", "NKcell_PHA+DEX",
+##                  "Tcell_LPS", "Tcell_PHA", "Tcell_LPS+DEX", "Tcell_PHA+DEX")
+
+## condition2 <- c("Bcell_LPS", "Monocyte_LPS", "NKcell_LPS", "Tcell_LPS",  
+##                 "Bcell_PHA", "Monocyte_PHA", "NKcell_PHA", "Tcell_PHA",  
+##                 "Bcell_LPS+DEX", "Monocyte_LPS+DEX", "NKcell_LPS+DEX", "Tcell_LPS+DEX",
+##                 "Bcell_PHA+DEX", "Monocyte_PHA+DEX", "NKcell_PHA+DEX", "Tcell_PHA+DEX")
+
+mat2 <- mat2[, condition2]
+
 
 b <- as.vector(mat2)
 b0 <- quantile(b[b<0], probs=seq(0, 1, length.out=49))
@@ -293,8 +315,8 @@ col_fun <-  colorRamp2(breaks,
    colorRampPalette(rev(brewer.pal(n=7, name="RdBu")))(99))
 
 column_ha <- HeatmapAnnotation(
-   celltype=gsub("_.*", "", condition),
-   contrast=gsub("-", "+", gsub(".*_", "", condition)),
+   celltype=gsub("_.*", "", condition2),
+   contrast=gsub("-", "+", gsub(".*_", "", condition2)),
    col=list(
       celltype=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
                  "NKcell"="#aa4b56", "Tcell"="#ffaa00"),
@@ -302,11 +324,40 @@ column_ha <- HeatmapAnnotation(
                   "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")),
    annotation_legend_param=list(celltype=list(labels_gp=gpar(fontsize=8)),
                                 contrast=list(labels_gp=gpar(fontsize=8))))
+
+
+###
+### row annotation
  
+### cluster pattern
+fn <- "./2_motif.activities.outs/Figure1.4_row_cluster.txt"
+geneCL <- read.table(fn, header=T)
+geneCL <- geneCL%>%mutate(cluster=paste("cluster", cluster, sep=""))
+
+df <- data.frame(cluster=c("cluster1", "cluster2", "cluster3", "cluster4"),
+                 cluster2=c("4", "1", "2", "3"))
+geneCL <- geneCL%>%left_join(df, by="cluster")
+
+ 
+anno_df <- data.frame(motif=rownames(mat2))
+anno_df2 <- anno_df%>%left_join(geneCL[,2:3], by="motif")%>%dplyr::select(Pattern=cluster2)
+
+
+row_ha <- rowAnnotation(df=anno_df2,
+   col=list(Pattern=c("1"="#1b9e77", "2"="#d95f02",
+                     "3"="#e7298a", "4"="#7570b3")),
+   annotation_legend_param=list(
+   Pattern=list(labels_gp=gpar(fontsize=8), title_gp=gpar(fontsize=10), grid_width=grid::unit(0.6, "cm"),
+                grid_height=grid::unit(0.8, "cm"))),
+   show_annotation_name=F, simple_anno_size=grid::unit(0.5, "cm")) 
+
+                        
+
 fig <- Heatmap(mat2, col=col_fun,
-   cluster_rows=T, cluster_columns=T,
-   show_row_dend=T,  show_column_dend=T,
+   cluster_rows=T, cluster_columns=F,
+   show_row_dend=T,  show_column_dend=F,
    top_annotation=column_ha,
+   right_annotation=row_ha,
    heatmap_legend_param=list(title="Diff motif",
       title_gp=gpar(fontsize=10, font=2),
       labels_gp=gpar(fontsize=10),
@@ -317,13 +368,31 @@ fig <- Heatmap(mat2, col=col_fun,
    column_names_gp=gpar(fontsize=10),
    row_names_gp=gpar(fontsize=8),
    use_raster=F, raster_device="png")
- 
-figfn <- "./2_motif.activities.outs/Figure1.2_heatmap.motif.activities.png"
-png(figfn, height=850, width=800, res=120)
+  
+figfn <- "./2_motif.activities.outs/Figure1.4_heatmap.motif.activities.png"
+png(figfn, height=850, width=900, res=120)
 set.seed(0)
 fig <- draw(fig)
 dev.off()
 
+
+###
+### cluster outputs
+hmap <- Heatmap(mat2, cluster_rows=T, cluster_columns=F, row_split=4)
+set.seed(0)
+hmap <- draw(hmap)
+cl <- row_order(hmap)
+
+
+DF_clu <- NULL
+for (i in 1:length(cl)){
+   ## 
+   tmp <- data.frame(cluster=i, motif=topmotif[cl[[i]]])
+   DF_clu <- rbind(DF_clu,tmp)
+}
+
+opfn <- paste(outdir, "Figure1.4_row_cluster.txt", sep="")
+write.table(DF_clu, file=opfn, row.names=F, col.names=T, quote=F, sep="\t")
 
 
 ### swap
@@ -356,7 +425,15 @@ dev.off()
 ## dev.off()
 
 
-##
+###
+### End
+
+
+### output motifs
+
+
+
+
 #################################
 ### write differential motif ###
 ################################
