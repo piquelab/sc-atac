@@ -96,7 +96,7 @@ https://www.nature.com/articles/ng.3737
 - Altered and allele-specific open chromatin landscape reveals epigenetic and genetic regulators of innate immunity in COVID-19,
 https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
-
+- A Genetic Variant Associated with Five Vascular Diseases Is a Distal Regulator of Endothelin-1 Gene Expression, https://www.sciencedirect.com/science/article/pii/S0092867417307687?via%3Dihub
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
