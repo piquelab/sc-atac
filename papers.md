@@ -1,4 +1,6 @@
 #### paper
+- ATAC-seq: A Method for Assaying Chromatin Accessibility Genome-Wide, 
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4374986/
 - ArchR is a scalable software package for integrative single-cell chromatin accessibility analysis, https://www.nature.com/articles/s41588-021-00790-6
 - Single-cell chromatin state analysis with Signac, https://www.nature.com/articles/s41592-021-01282-5
 - Cicero Predicts cis-Regulatory DNA Interactions from Single-Cell Chromatin Accessibility Data, https://www.cell.com/molecular-cell/fulltext/S1097-2765(18)30547-1#%20
