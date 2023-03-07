@@ -119,6 +119,7 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Epigenomic profiling of glucocorticoid responses identifies cis-regulatory disruptions impacting steroid resistance in childhood acute lymphoblastic leukemia, (https://www.nature.com/articles/s41375-022-01685-z#Fig7)
 - Repression of transcription by the glucocorticoid receptor: A parsimonious model for the genomics era, https://www.jbc.org/article/S0021-9258(21)00476-2/fulltext
 - Integrative QTL analysis of gene expression and chromatin accessibility identifies multi-tissue patterns of genetic regulation, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1008537
+- Deregulated Regulators: Disease-Causing cis Variants in Transcription Factor Genes, https://www.cell.com/trends/genetics/fulltext/S0168-9525(20)30088-3
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
