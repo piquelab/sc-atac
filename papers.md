@@ -1,4 +1,6 @@
 #### paper
+- ATAC-seq: A Method for Assaying Chromatin Accessibility Genome-Wide, 
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4374986/
 - ArchR is a scalable software package for integrative single-cell chromatin accessibility analysis, https://www.nature.com/articles/s41588-021-00790-6
 - Single-cell chromatin state analysis with Signac, https://www.nature.com/articles/s41592-021-01282-5
 - Cicero Predicts cis-Regulatory DNA Interactions from Single-Cell Chromatin Accessibility Data, https://www.cell.com/molecular-cell/fulltext/S1097-2765(18)30547-1#%20
@@ -96,7 +98,8 @@ https://www.nature.com/articles/ng.3737
 - Altered and allele-specific open chromatin landscape reveals epigenetic and genetic regulators of innate immunity in COVID-19,
 https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
-
+- A Genetic Variant Associated with Five Vascular Diseases Is a Distal Regulator of Endothelin-1 Gene Expression, https://www.sciencedirect.com/science/article/pii/S0092867417307687?via%3Dihub
+- The role of regulatory variation in complex traits and disease, https://www.nature.com/articles/nrg3891
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -115,6 +118,9 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - IL-1 receptor 2 (IL-1R2) and its role in immune regulation, https://www.sciencedirect.com/science/article/pii/S0889159112004928?via%3Dihub
 - A General Introduction to Glucocorticoid Biology, https://www.frontiersin.org/articles/10.3389/fimmu.2019.01545/full
 - Epigenomic profiling of glucocorticoid responses identifies cis-regulatory disruptions impacting steroid resistance in childhood acute lymphoblastic leukemia, (https://www.nature.com/articles/s41375-022-01685-z#Fig7)
+- Repression of transcription by the glucocorticoid receptor: A parsimonious model for the genomics era, https://www.jbc.org/article/S0021-9258(21)00476-2/fulltext
+- Integrative QTL analysis of gene expression and chromatin accessibility identifies multi-tissue patterns of genetic regulation, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1008537
+- Deregulated Regulators: Disease-Causing cis Variants in Transcription Factor Genes, https://www.cell.com/trends/genetics/fulltext/S0168-9525(20)30088-3
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
