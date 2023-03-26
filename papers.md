@@ -70,12 +70,7 @@ https://www.nature.com/articles/s41590-022-01229-8
 https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author#!
 - Multiscale 3D genome organization underlies ILC2 ontogenesis and allergic airway inflammation, (https://www.nature.com/articles/s41590-022-01295-y)
 - Effect of genomic and cellular environments on gene expression noise, https://www.biorxiv.org/content/10.1101/2022.08.31.506082v1.full
-- Shared and distinct genetic risk factors for childhood-onset and adult-onset asthma: genome-wide and transcriptome-wide studies, https://www.clinicalkey.com/#!/content/playContent/1-s2.0-S2213260019300554?returnurl=https:%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2213260019300554%3Fshowall%3Dtrue&referrer=https:%2F%2Fpubmed.ncbi.nlm.nih.gov%2F
-- Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
 - Genetic ancestry effects on the response to viral infection are pervasive but cell type specific, https://www.science.org/doi/10.1126/science.abg0928
-- A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
-- A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
-- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
 - Enhanced transcriptional heterogeneity mediated by NF-κB super-enhancers, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010235
 - Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
@@ -100,6 +95,13 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
 - A Genetic Variant Associated with Five Vascular Diseases Is a Distal Regulator of Endothelin-1 Gene Expression, https://www.sciencedirect.com/science/article/pii/S0092867417307687?via%3Dihub
 - The role of regulatory variation in complex traits and disease, https://www.nature.com/articles/nrg3891
+- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
+- A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
+- A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
+- Shared and distinct genetic risk factors for childhood-onset and adult-onset asthma: genome-wide and transcriptome-wide studies, https://www.clinicalkey.com/#!/content/playContent/1-s2.0-S2213260019300554?returnurl=https:%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2213260019300554%3Fshowall%3Dtrue&referrer=https:%2F%2Fpubmed.ncbi.nlm.nih.gov%2F
+- Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
+
+
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
