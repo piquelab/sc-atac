@@ -100,7 +100,7 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
 - Asthma-associated genetic variants induce IL33 differential expression through an enhancer-blocking regulatory region, https://www.nature.com/articles/s41467-021-26347-z
 - African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
-
+- Multiancestry association study identifies new asthma risk loci that colocalize with immune-cell enhancer marks, https://www.nature.com/articles/s41588-017-0014-7
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
