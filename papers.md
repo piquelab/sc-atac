@@ -45,6 +45,7 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4374986/
 - Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
 - Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
 - Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
+- Single-cell multiome of the human retina and deep learning nominate causal variants in complex eye diseases, https://www.cell.com/cell-genomics/pdfExtended/S2666-979X(22)00106-9
 
 - Single-cell eQTL mapping identifies cell type–specific genetic control of autoimmune disease, https://www.science.org/doi/10.1126/science.abf3041
 - Single-cell RNA-seq reveals cell type–specific molecular and genetic associations to lupus, https://www.science.org/doi/full/10.1126/science.abf1970
