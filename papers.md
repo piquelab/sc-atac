@@ -89,6 +89,8 @@ https://www.nature.com/articles/s41588-018-0089-9
 - Identification of context-dependent expression quantitative trait loci in whole blood, [
 https://www.nature.com/articles/ng.3737
 - Single cell eQTL analysis identifies cell type-specific genetic control of gene expression in fibroblasts and reprogrammed induced pluripotent stem cells, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02293-3
+- Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data,
+https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02897-x
 - Altered and allele-specific open chromatin landscape reveals epigenetic and genetic regulators of innate immunity in COVID-19,
 https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
