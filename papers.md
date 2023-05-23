@@ -129,6 +129,7 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Deregulated Regulators: Disease-Causing cis Variants in Transcription Factor Genes, https://www.cell.com/trends/genetics/fulltext/S0168-9525(20)30088-3
 - The role of the BTLA-HVEM complex in the pathogenesis of autoimmune diseases, https://www.sciencedirect.com/science/article/pii/S0008874922000569?via%3Dihub
 - Genome-wide association study to identify genetic determinants of severe asthma, https://thorax.bmj.com/content/67/9/762.long
+- The molecular basis of the host response to lipopolysaccharide, https://www.nature.com/articles/nrmicro2266
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
