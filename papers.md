@@ -24,7 +24,6 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4374986/
 - Mapping the genetic architecture of human traits to cell types in the kidney identifies mechanisms of disease and potential treatments, https://www.nature.com/articles/s41588-021-00909-9#Fig3
 - Multimodal single-cell chromatin analysis with Signac, https://www.biorxiv.org/content/10.1101/2020.11.09.373613v1.full
 - Corticosterone pattern-dependent glucocorticoid receptor binding and transcriptional regulation within the liver, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009737
-- Asthma-associated genetic variants induce IL33 differential expression through an enhancer-blocking regulatory region, https://www.nature.com/articles/s41467-021-26347-z
 - The GTEx Consortium atlas of genetic regulatory effects across human tissues, https://www.science.org/doi/full/10.1126/science.aaz1776
 - CD4 T-Cell Memory Generation and Maintenance, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4062920/
 - Effector and memory T-cell differentiation: implications for vaccine development, https://www.nature.com/articles/nri778
@@ -46,6 +45,7 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4374986/
 - Genetic Drivers of Epigenetic and Transcriptional Variation in Human Immune Cells, https://www.sciencedirect.com/science/article/pii/S0092867416314465
 - Transcription factor regulation of eQTL activity across individuals and tissue, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009719
 - Determinants of transcription factor regulatory range, https://www.nature.com/articles/s41467-020-16106-x
+- Single-cell multiome of the human retina and deep learning nominate causal variants in complex eye diseases, https://www.cell.com/cell-genomics/pdfExtended/S2666-979X(22)00106-9
 
 - Single-cell eQTL mapping identifies cell type–specific genetic control of autoimmune disease, https://www.science.org/doi/10.1126/science.abf3041
 - Single-cell RNA-seq reveals cell type–specific molecular and genetic associations to lupus, https://www.science.org/doi/full/10.1126/science.abf1970
@@ -70,20 +70,14 @@ https://www.nature.com/articles/s41590-022-01229-8
 https://www.sciencedirect.com/science/article/pii/S2405471222003489?dgcid=author#!
 - Multiscale 3D genome organization underlies ILC2 ontogenesis and allergic airway inflammation, (https://www.nature.com/articles/s41590-022-01295-y)
 - Effect of genomic and cellular environments on gene expression noise, https://www.biorxiv.org/content/10.1101/2022.08.31.506082v1.full
-- Shared and distinct genetic risk factors for childhood-onset and adult-onset asthma: genome-wide and transcriptome-wide studies, https://www.clinicalkey.com/#!/content/playContent/1-s2.0-S2213260019300554?returnurl=https:%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2213260019300554%3Fshowall%3Dtrue&referrer=https:%2F%2Fpubmed.ncbi.nlm.nih.gov%2F
-- Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
 - Genetic ancestry effects on the response to viral infection are pervasive but cell type specific, https://www.science.org/doi/10.1126/science.abg0928
-- A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
-- A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
-- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.medrxiv.org/content/10.1101/2021.11.30.21267108v2
 - Enhanced transcriptional heterogeneity mediated by NF-κB super-enhancers, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010235
 - Large-scale cis- and trans-eQTL analyses identify thousands of genetic loci and polygenic scores that regulate blood gene expression, https://www.nature.com/articles/s41588-021-00913-z
 - Single-cell RNA sequencing identifies celltype-specific cis-eQTLs and co-expression QTLs, https://www.nature.com/articles/s41588-018-0089-9
 - Transcriptional risk scores link GWAS to eQTLs and predict complications in Crohn's disease, https://www.nature.com/articles/ng.3936 
-- Psychosocial experiences modulate asthma-associated genes through geneenvironment interactions, https://elifesciences.org/articles/63852.pdf
+- Psychosocial experiences modulate asthma-associated genes through gene environment interactions, https://elifesciences.org/articles/63852.pdf
 - Single-Cell Epigenomics and Functional Fine-Mapping of Atherosclerosis GWAS Loci, https://www.ahajournals.org/doi/10.1161/CIRCRESAHA.121.318971
 - Limited overlap of eQTLs and GWAS hits due to systematic differences in discovery, https://www.biorxiv.org/content/10.1101/2022.05.07.491045v1
-- African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
 - Tissue-specific enhancer-gene maps from multimodal single-cell data identify causal disease alleles, https://www.medrxiv.org/content/10.1101/2022.10.27.22281574v1
 - Environmental and genetic drivers of population differences in SARS-CoV2 2 immune responses, https://www.biorxiv.org/content/10.1101/2022.11.22.517073v1.full.pdf
 - Identification of context-dependent expression quantitative trait loci in whole blood, https://www.nature.com/articles/ng.3737
@@ -95,11 +89,23 @@ https://www.nature.com/articles/s41588-018-0089-9
 - Identification of context-dependent expression quantitative trait loci in whole blood, [
 https://www.nature.com/articles/ng.3737
 - Single cell eQTL analysis identifies cell type-specific genetic control of gene expression in fibroblasts and reprogrammed induced pluripotent stem cells, https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02293-3
+- Identification of genetic variants that impact gene co-expression relationships using large-scale single-cell data,
+https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02897-x
 - Altered and allele-specific open chromatin landscape reveals epigenetic and genetic regulators of innate immunity in COVID-19,
 https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Transcription factor binding process is the primary driver of noise in gene expression, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1010535
 - A Genetic Variant Associated with Five Vascular Diseases Is a Distal Regulator of Endothelin-1 Gene Expression, https://www.sciencedirect.com/science/article/pii/S0092867417307687?via%3Dihub
 - The role of regulatory variation in complex traits and disease, https://www.nature.com/articles/nrg3891
+- Multi-ancestry meta-analysis of asthma identifies novel associations and highlights the value of increased power and diversity, https://www.sciencedirect.com/science/article/pii/S2666979X22001653?via%3Dihub
+
+- A genome-wide cross-trait analysis from UK Biobank highlights the shared genetic architecture of asthma and allergic diseases, https://www.nature.com/articles/s41588-018-0121-0
+- A catalog of GWAS fine-mapping efforts in autoimmune disease, https://www.sciencedirect.com/science/article/pii/S0002929721000938#:~:text=Abbreviations%20are%20as%20follows%3A%20CD,%3B%20and%20UC%2C%20ulcerative%20colitis.
+- Shared and distinct genetic risk factors for childhood-onset and adult-onset asthma: genome-wide and transcriptome-wide studies, https://www.clinicalkey.com/#!/content/playContent/1-s2.0-S2213260019300554?returnurl=https:%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2213260019300554%3Fshowall%3Dtrue&referrer=https:%2F%2Fpubmed.ncbi.nlm.nih.gov%2F
+- Genome-wide analysis highlights contribution of immune system pathways to the genetic architecture of asthma, https://www.nature.com/articles/s41467-020-15649-3
+- Asthma-associated genetic variants induce IL33 differential expression through an enhancer-blocking regulatory region, https://www.nature.com/articles/s41467-021-26347-z
+- African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
+- Multiancestry association study identifies new asthma risk loci that colocalize with immune-cell enhancer marks, https://www.nature.com/articles/s41588-017-0014-7
+- Transcription factor binding site orientation and order are major drivers of gene regulatory activity, https://www.nature.com/articles/s41467-023-37960-5
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
@@ -121,6 +127,9 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - Repression of transcription by the glucocorticoid receptor: A parsimonious model for the genomics era, https://www.jbc.org/article/S0021-9258(21)00476-2/fulltext
 - Integrative QTL analysis of gene expression and chromatin accessibility identifies multi-tissue patterns of genetic regulation, https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1008537
 - Deregulated Regulators: Disease-Causing cis Variants in Transcription Factor Genes, https://www.cell.com/trends/genetics/fulltext/S0168-9525(20)30088-3
+- The role of the BTLA-HVEM complex in the pathogenesis of autoimmune diseases, https://www.sciencedirect.com/science/article/pii/S0008874922000569?via%3Dihub
+- Genome-wide association study to identify genetic determinants of severe asthma, https://thorax.bmj.com/content/67/9/762.long
+- The molecular basis of the host response to lipopolysaccharide, https://www.nature.com/articles/nrmicro2266
 
 #### tools
 - ArchR, https://www.archrproject.com/index.html
