@@ -106,6 +106,7 @@ https://www.cell.com/cell-genomics/fulltext/S2666-979X(22)00190-2#%20
 - African-specific alleles modify risk for asthma at the 17q12-q21 locus in African Americans, https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01114-x
 - Multiancestry association study identifies new asthma risk loci that colocalize with immune-cell enhancer marks, https://www.nature.com/articles/s41588-017-0014-7
 - Transcription factor binding site orientation and order are major drivers of gene regulatory activity, https://www.nature.com/articles/s41467-023-37960-5
+- Interpreting non-coding disease-associated human variants using single-cell epigenomics, https://www.nature.com/articles/s41576-023-00598-6
 
 - #### biology function
 - Type I interferons in infectious disease, https://www.nature.com/articles/nri3787
