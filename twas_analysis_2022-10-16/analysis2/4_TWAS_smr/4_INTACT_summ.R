@@ -98,7 +98,7 @@ twas2 <- twas%>%dplyr::select(Gene=gene, FDR_twas=FDR)
 
 res2 <- res%>%left_join(anno, by="genetic_variant")%>%left_join(geneDF, by="Gene")%>%left_join(twas2, by="Gene")
 
-opfn <- paste(outdir2, trait, "aloft_topPIP_union_combinfor.txt", sep="")
+opfn <- paste(outdir2, trait, "_aloft_topPIP_union_combinfor.txt", sep="")
 write.table(res2, file=opfn, quote=F, row.names=F, sep="\t")
 
 ## nsig <- res2%>%filter(FDR<0.1)%>%pull(symbol)%>%length()
