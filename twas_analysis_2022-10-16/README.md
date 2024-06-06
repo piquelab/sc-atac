@@ -2,6 +2,6 @@
 
 
 
-We first downloaded the new gwas data for asthma diseases in the folder `./gwas_asthma_GBMI/` from [the Global Biobank Meta-analyses Initiative (GBMI)](https://www.sciencedirect.com/science/article/pii/S2666979X22001653?via%3Dihub), including three ancestry population summary data, African, European and all the populations.
+We first downloaded the new gwas data for asthma diseases in the folder `./gwas_asthma_GBMI/` from the Global Biobank Meta-analyses Initiative (GBMI) [from the paper](https://www.sciencedirect.com/science/article/pii/S2666979X22001653?via%3Dihub), including three ancestry population summary data, African, European and all the populations.
 
-The folder `analysis2` for new gwas data.
+The folder `analysis2` includes the script for new gwas data.
