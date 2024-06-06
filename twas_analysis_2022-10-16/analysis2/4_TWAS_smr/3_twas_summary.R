@@ -33,7 +33,7 @@ rm(list=ls())
 outdir <- "./3_twas_summary.outs/"
 if ( !file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
-
+ 
 ###########################
 ### calculate FDR 
 ###########################
@@ -55,6 +55,32 @@ for ( ii in methods){
    ##
 }    
 
+
+###
+##
+autosome <- as.character(1:22) 
+grch38_unq <- grch38%>%
+    dplyr::filter(chr%in%autosome, grepl("protein", biotype))%>%
+    distinct(ensgene, chr, .keep_all=T)%>%dplyr::select(gene=ensgene, chr, biotype, symbol)
+
+
+
+###
+### aloft_min
+ii <- methods[1]
+fn0 <- paste("./3_twas_summary.outs/", trait, "_", ii, "_twas.txt.gz", sep="")
+res0 <- fread(fn0, header=T, data.table=F)
+nsig0 <- sum(res0$FDR<0.1)
+
+### aloft_topPIP
+ii <- methods[2]
+fn <- paste("./3_twas_summary.outs/", trait, "_", ii, "_twas.txt.gz", sep="")
+res <- fread(fn, header=T, data.table=F)
+nsig <- sum(res$FDR<0.1) 
+
+
+
+
 ######################
 ### autosome genes ###
 ######################
@@ -64,7 +90,7 @@ for ( ii in methods){
 ##     dplyr::filter(chr%in%autosome, grepl("protein", biotype))%>%
 ##     distinct(ensgene, chr, .keep_all=T)%>%dplyr::select(gene=ensgene, chr, biotype, symbol)
 
-
+ 
 #########################################
 ### histogram distribution of p-value ###
 #########################################
@@ -262,11 +288,9 @@ methods <- c("aloft_minP", "aloft_topPIP_union", "aloft_topPIP_dtss",
              "gtex_minP", "gtex_topPIP_union", "gtex_topPIP_dtss")
 col2 <- c("aloft_minP"="#00BFC4", "aloft_topPIP_union"="#F8766D", "aloft_topPIP_dtss"="#7CAE00",
              "gtex_minP"="#00BFC4", "gtex_topPIP_union"="#F8766D", "gtex_topPIP_dtss"="#7CAE00")
-
-for ( trait in traits[3:4]){
-
  
-   plotDF <- map_dfr(methods[1:3], function(ii){
+trait <- traits[3]
+plotDF <- map_dfr(methods[1:2], function(ii){
       ##
       fn <- paste("./twas_smr.outs/", trait, "_", ii, "_twas.txt.gz", sep="")
       res0 <- fread(fn, header=T,  data.table=F)
@@ -276,12 +300,12 @@ for ( trait in traits[3:4]){
           mutate(observed=-log10(pval_gwas), expected=-log10(ppoints(ngene)), conditions=ii)
       ##
       res0
-   })
+})
 
    trait0 <- trait_short[trait]
     
    p1  <- ggplot(plotDF, aes(x=expected, y=observed, color=conditions))+
-      geom_point(size=0.1)+
+      geom_point(size=1)+
       scale_color_manual(values=col2, guide=guide_legend(override.aes=list(size=1.5)))+ 
    ## geom_ribbon(aes(ymax=cupper, ymin=clower), fill="grey", alpha=0.5)+ 
       geom_abline(slope=1, intercept=0)+
@@ -299,12 +323,17 @@ for ( trait in traits[3:4]){
          axis.text=element_text(size=10),
          axis.title=element_text(size=10),
          plot.title=element_text(hjust=0.5, size=10))
+##
+## figfn <- paste(outdir, "Figure2_", trait, ".qq.png", sep="")
+## ggsave(figfn, p1, width=780, height=380, units="px", dpi=120)
+
+
   ## ,
   ##        panel.grid.major=element_blank(),
   ##        panel.grid.minor=element_blank())
     
-   ### GTEX
-   plotDF2 <- map_dfr(methods[4:6], function(ii){
+  ##  GTEX
+   plotDF2 <- map_dfr(methods[4:5], function(ii){
       ##
       fn <- paste("./twas_smr.outs/", trait, "_", ii, "_twas.txt.gz", sep="")
       res0 <- fread(fn, header=T,  data.table=F)
@@ -317,7 +346,7 @@ for ( trait in traits[3:4]){
    })
    
    p2  <- ggplot(plotDF2, aes(x=expected, y=observed, color=conditions))+
-      geom_point(size=0.1)+
+      geom_point(size=1)+
       scale_color_manual(values=col2, guide=guide_legend(override.aes=list(size=1.5)))+ 
    ## geom_ribbon(aes(ymax=cupper, ymin=clower), fill="grey", alpha=0.5)+ 
       geom_abline(slope=1, intercept=0)+
@@ -344,9 +373,9 @@ for ( trait in traits[3:4]){
      figfn <- paste(outdir, "Figure2_", trait, ".qq.png", sep="")
      ggsave(figfn, pcomb, width=780, height=380, units="px", dpi=120)
   
-     ###
-     cat(trait0, "\n")    
-}    
+##      ###
+##      cat(trait0, "\n")    
+## }    
        
 
 
