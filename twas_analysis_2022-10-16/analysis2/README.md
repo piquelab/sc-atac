@@ -4,18 +4,20 @@ The working directory is is in the path `/nfs/rprdata/julong/sc-atac/twas_analys
 
 ## gwas data
 - `gwas_data` contains the raw gwas data
-- `impute` impute the variants in eqtl but not in the gwas data
+- `impute` impute the variants that eqtl data has while the gwas data didn't have.  
 - `torus` fine-mapping gwas using torus, which will be used in colocalization analysis
 
  
 ## colocalization analaysis 
-We do colocalization analysis using two cohorts, ALOFT in the folder `3_enloc_aloft` and GTEx in the folder `3_enloc_gtex` 
+We perform colocalization analysis using two cohorts, ALOFT in the folder `3_enloc_aloft` and GTEx in the folder `3_enloc_gtex`. Here we focused ALOFT cohorts.
+- `2_gwas_rs.R`, We need make transformation for the snp id in the gwas to make these the same to eqtl data.   
+- `3_batch_enloc.sh`, Colocalization analysis 
 
 ## TWAS analysis in the folder `4_TWAS_smr` 
 We performed the TWAS analysis using SMR approach by integrating the two eQTL cohort (ALOFT cohort and GTEx)  and GBMI_full asthma population.
-- `1_ALOFT.R`
-- `2_GTEx_wbl.R`
-- `3_twas_summary.R`
-- `4_INTACT_summ.R`
-- Plots and summary table for manuscirpt
+- `1_ALOFT.R`, TWAS using SMR for ALOFT cohort, the topPIP with annotation and minP
+- `2_GTEx_wbl.R`, TWAS using SMR for GTEx Whole blood cohort, the topPIP with annotation and minP
+- `3_twas_summary.R`, summarize TWAS results, density, histogram plots and qq plots 
+- `4_INTACT_summ.R`, run intact to combine TWAS and colocalization. Also combine all information for output file, including, twas, colocalization, pval and PIP for eqtl and annotation
+- `5.1_plots_main.R`, `5.2_plots_supp.R` and `5.3_get_genes_table.R`, script for main figures, supp figures and tables in the manuscript
  
