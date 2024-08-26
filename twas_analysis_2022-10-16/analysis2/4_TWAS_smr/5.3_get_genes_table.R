@@ -30,7 +30,7 @@ options(scipen=16)
 rm(list=ls())
 
 
-outdir <- "./5_pub.outs/3_example_plots/"
+outdir <- "./5_pub.outs/2_supp_tables/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 
@@ -53,6 +53,18 @@ res2 <- res2%>%arrange(FDR_intact)
 ###
 opfn <- gzfile(paste(outdir, "TableS5_1_asthma-risk-genes_ALOFT.txt.gz", sep=""))
 write.table(res2, file=opfn, quote=F, row.names=F, sep="\t")
+
+
+####
+fn <- paste(outdir, "TableS5_1_asthma-risk-genes_ALOFT.txt.gz", sep="")
+res <- fread(fn, header=T, data.table=F)
+
+x <- str_split(res$genetic_variant, ":", simplify=T)
+
+res2 <- data.frame(res[,1:5], chr_pos_grch37=paste(x[,1], x[,2], sep="_"), res[,6:14])
+opfn <- gzfile(paste(outdir, "TableS5_1_asthma-risk-genes_ALOFT.txt.gz", sep=""))
+write.table(res2, file=opfn, quote=F, row.names=F, sep="\t")
+
 
 
 
@@ -131,6 +143,16 @@ motifRsps <- sort(unique(motifRsps$motif.id))
 
 snpmotif2 <- snpmotif%>%filter(motifs%in%motifRsps)
 
+
+## x <- snpmotif2%>%filter(abs(score_alt-score_ref)>log2(20))
+## snp_sig <- unique(x$variants)
+## ##
+## fn <- "/nfs/rprdata/julong/sc-atac/genetic_analysis_ALOFT/DAP-G/5_summary.outs/aloft_allSNPs_union.txt.gz"
+## dap <- fread(fn, header=F)
+## snp2 <- dap%>%filter(V3>0.9)%>%pull(V2)%>%unique()
+
+## snp2_sig <- intersect(snp_sig, snp2)
+
 ###
 annoMotif <- sapply(1:nrow(res2), function(i){    
   ##   
@@ -163,6 +185,8 @@ fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep="")
 res <- fread(fn, header=T, sep="\t")
 res <- res%>%mutate(chr_pos=paste(chromosome, pos, sep="_"))
 
+res <- res[,1:18]
+
 ###
 fn2 <- "/nfs/rprdata/julong/sc-atac/demux.2021-01-23/asequant/asefinal.txt.gz"
 ase <- fread(fn2, header=T, data.table=F)  
@@ -181,9 +205,9 @@ ase_summ <- map_dfr(1:nrow(res), function(i){
       if ( nrow(ase0)>1){
           ase0 <- ase0%>%slice_max(order_by=abs(beta), n=1, with_ties=F)
       }    
-      ase0 <- ase0%>%dplyr::select(ase_comb=comb, ase_beta=beta, ase_pval=pval)
+      ase0 <- ase0%>%dplyr::select(ase_comb=comb, ase_beta=beta, ase_pval=pval, ase_fdr=p.adj)
    }else{
-      ase0 <- data.frame(ase_comb=NA, ase_beta=NA, ase_pval=NA)
+      ase0 <- data.frame(ase_comb=NA, ase_beta=NA, ase_pval=NA, ase_fdr=NA)
    }   
    ase0    
 })
@@ -194,19 +218,30 @@ res2 <- cbind(res, ase_summ)
 opfn <- gzfile(paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep=""))
 write.table(res2, file=opfn, quote=F, row.names=F, sep="\t")
 
+
 ### save xlsx file 
 opfn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.xlsx", sep="")
 write.xlsx(res2, file=opfn)
 
 
+###
+### reorder column for final manuscript 
+fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep="")
+res <- read.table(fn, header=T, sep="\t")
+
+x <- str_split(res$genetic_variant, ":", simplify=T)
+
+res2 <- data.frame(res[,1:5], chr_pos_grch37=paste(x[,1], x[,2], sep="_"), res[, c(6:14, 16:17, 19:22)])
+opfn <- gzfile(paste(outdir, "TableS5_2_asthma-risk-genes_in_response_ALOFT.txt.gz", sep=""))
+write.table(res2, file=opfn, quote=F, row.names=F, sep="\t")
 
 
 ##########################
 ### differential
 ##########################
 
-
-fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep="")
+ 
+fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response_ALOFT.txt.gz", sep="")
 res <- read.table(fn, header=T, sep="\t")
 
 fn <- "/nfs/rprdata/julong/sc-atac/analyses.2021-02-05/2_Differential/1.3_DiffPeak.outs/3.0_DESeq_indi.results.rds"
@@ -228,6 +263,7 @@ DF <- map_dfr(1:nrow(res), function(i){
 ###
 opfn <- gzfile(paste(outdir, "TableS5_3_asthma-risk-genes_peak.txt.gz", sep=""))
 write.table(DF, file=opfn, quote=F, row.names=F, sep="\t")
+
 
 
 ####
@@ -281,27 +317,45 @@ write.xlsx(res, file=opfn)
 
 
 
+
+
+
+##################################
+#### risk genes from GTEx
+##################################
+
+
+
+
+
+
+
+
+
+
+
+
 ##############################
 ### summary ase results
 ###############################
 
-fn <- gzfile(paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep=""))
-res <- read.table(fn, header=T, sep="\t")
+## fn <- gzfile(paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep=""))
+## res <- read.table(fn, header=T, sep="\t")
  
-fn <- "/nfs/rprdata/julong/sc-atac/demux.2021-01-23/asequant/asefinalsigAlt.txt.gz"
-ase <- fread(fn, header=T, data.table=F)  
+## fn <- "/nfs/rprdata/julong/sc-atac/demux.2021-01-23/asequant/asefinalsigAlt.txt.gz"
+## ase <- fread(fn, header=T, data.table=F)  
 
-ase2 <- ase%>%filter(id%in%res$genetic_variant) 
+## ase2 <- ase%>%filter(id%in%res$genetic_variant) 
 
-ase2 <- map_dfr(1:nrow(ase2), function(i){
-   ##
-   res0 <- res%>%dplyr::filter(genetic_variant==ase2$id[i])
-   tmp0 <- cbind(ase2[i,], res0[1,])
-   tmp0
-})
+## ase2 <- map_dfr(1:nrow(ase2), function(i){
+##    ##
+##    res0 <- res%>%dplyr::filter(genetic_variant==ase2$id[i])
+##    tmp0 <- cbind(ase2[i,], res0[1,])
+##    tmp0
+## })
 
-opfn <- paste(outdir, "TableS5_5_asthma-risk-genes_ase.xlsx", sep="")
-write.xlsx(ase2, opfn)
+## opfn <- paste(outdir, "TableS5_5_asthma-risk-genes_ase.xlsx", sep="")
+## write.xlsx(ase2, opfn)
 
 
 
@@ -309,57 +363,57 @@ write.xlsx(ase2, opfn)
 ### extract results 
 ##########################
 
-outdir2 <- "./5_pub.outs/3_example_plots/Example2_table/"
-if (!file.exists(outdir2)) dir.create(outdir2, showWarnings=F, recursive=T)
+## outdir2 <- "./5_pub.outs/3_example_plots/Example2_table/"
+## if (!file.exists(outdir2)) dir.create(outdir2, showWarnings=F, recursive=T)
 
 
-fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep="")
-res <- fread(fn, header=T, sep="\t")
-res2 <- res%>%filter(PIP>0.1, FDR_twas<0.1)%>%arrange(pval_twas)
+## fn <- paste(outdir, "TableS5_2_asthma-risk-genes_in_response.txt.gz", sep="")
+## res <- fread(fn, header=T, sep="\t")
+## res2 <- res%>%filter(PIP>0.1, FDR_twas<0.1)%>%arrange(pval_twas)
 
-### DP
-fn <- paste(outdir, "TableS5_3_asthma-risk-genes_peak.txt.gz", sep="")
-resDP <- fread(fn, header=T, sep="\t")
+## ### DP
+## fn <- paste(outdir, "TableS5_3_asthma-risk-genes_peak.txt.gz", sep="")
+## resDP <- fread(fn, header=T, sep="\t")
 
 
-### motifs
-fn <- paste(outdir, "TableS5_4_asthma-risk-genes_motif.txt.gz", sep="")
-resMotif <- fread(fn, header=T, sep="\t")
+## ### motifs
+## fn <- paste(outdir, "TableS5_4_asthma-risk-genes_motif.txt.gz", sep="")
+## resMotif <- fread(fn, header=T, sep="\t")
 
-###
-###
-for (i in c(1:10, 50)){
+## ###
+## ###
+## for (i in c(1:10, 50)){
 
-###    
-symbol0 <- res2$symbol[i]
-ens <- res2$Gene[i]
+## ###    
+## symbol0 <- res2$symbol[i]
+## ens <- res2$Gene[i]
 
-### DARs
-resDP2 <- resDP%>%filter(symbol==symbol0)%>%
-    mutate(conditions=paste(MCls, contrast, sep="_"),
-           baseMean=round(baseMean, 3), estimate=round(estimate, 3),
-           p.value=round(p.value, 3), p.adjusted=round(p.adjusted, 3),
-           is_sig=ifelse(p.adjusted<0.1&abs(estimate)>0.5, 1, 0))%>%
-    dplyr::select(conditions, peak, estimate, pval=p.value, FDR=p.adjusted, is_sig)%>%
-    arrange(desc(abs(estimate)))
+## ### DARs
+## resDP2 <- resDP%>%filter(symbol==symbol0)%>%
+##     mutate(conditions=paste(MCls, contrast, sep="_"),
+##            baseMean=round(baseMean, 3), estimate=round(estimate, 3),
+##            p.value=round(p.value, 3), p.adjusted=round(p.adjusted, 3),
+##            is_sig=ifelse(p.adjusted<0.1&abs(estimate)>0.5, 1, 0))%>%
+##     dplyr::select(conditions, peak, estimate, pval=p.value, FDR=p.adjusted, is_sig)%>%
+##     arrange(desc(abs(estimate)))
 
-opfn <- paste(outdir2, "Table_", i, "_", ens, "_", symbol0, "_DAR.xlsx", sep="")
-write.xlsx(resDP2, file=opfn)
+## opfn <- paste(outdir2, "Table_", i, "_", ens, "_", symbol0, "_DAR.xlsx", sep="")
+## write.xlsx(resDP2, file=opfn)
 
     
-### Motifs
-resMotif2 <- resMotif%>%filter(symbol==symbol0)%>%
-    mutate(conditions=paste(MCls, contrast, sep="_"),
-           beta=round(beta, 3), pval=round(pval, 3), qval=round(qval,3))%>%
-   dplyr::select(conditions, motif_ID, motif_name, beta, pval, qval)%>%
-   arrange(desc(abs(beta)))
+## ### Motifs
+## resMotif2 <- resMotif%>%filter(symbol==symbol0)%>%
+##     mutate(conditions=paste(MCls, contrast, sep="_"),
+##            beta=round(beta, 3), pval=round(pval, 3), qval=round(qval,3))%>%
+##    dplyr::select(conditions, motif_ID, motif_name, beta, pval, qval)%>%
+##    arrange(desc(abs(beta)))
 
-opfn2 <- paste(outdir2, "Table_", i, "_", ens, "_", symbol0, "_motif.xlsx", sep="")
-write.xlsx(resMotif2, file=opfn2)
+## opfn2 <- paste(outdir2, "Table_", i, "_", ens, "_", symbol0, "_motif.xlsx", sep="")
+## write.xlsx(resMotif2, file=opfn2)
 
-cat(symbol0, "\n")
+## cat(symbol0, "\n")
 
-}    
+## }    
 
 
 #############################################
@@ -372,36 +426,36 @@ res <- fread(fn, header=T, sep="\t")
 res2 <- res%>%filter(FDR_intact<0.1)
 
 
-### eGenes
-fn <- "/nfs/rprdata/julong/sc-atac/eqtl_analysis_plots/2_tables/TableS4_2_eGene_scaip_dap.txt.gz"
-dap <- fread(fn, header=T)
-dap <- dap%>%group_by(conditions, gene)%>%distinct(gene)
+## ### eGenes
+## fn <- "/nfs/rprdata/julong/sc-atac/eqtl_analysis_plots/2_tables/TableS4_2_eGene_scaip_dap.txt.gz"
+## dap <- fread(fn, header=T)
+## dap <- dap%>%group_by(conditions, gene)%>%distinct(gene)
 
-plotDF <- map_dfr(sort(unique(dap$conditions)), function(ii){
-    ##
-    egene <- dap%>%filter(conditions==ii)%>%pull(gene)
-    olap <- intersect(egene, res2$Gene)
-    df0 <- data.frame(conditions=ii, olap=length(olap))
-    df0
-})    
+## plotDF <- map_dfr(sort(unique(dap$conditions)), function(ii){
+##     ##
+##     egene <- dap%>%filter(conditions==ii)%>%pull(gene)
+##     olap <- intersect(egene, res2$Gene)
+##     df0 <- data.frame(conditions=ii, olap=length(olap))
+##     df0
+## })    
 
-plotDF <- plotDF%>%filter(olap>0)%>%
-   mutate(condition2=gsub("-", "+", conditions),
-          condition2=fct_reorder(condition2, olap))
+## plotDF <- plotDF%>%filter(olap>0)%>%
+##    mutate(condition2=gsub("-", "+", conditions),
+##           condition2=fct_reorder(condition2, olap))
 
-##
-p0 <- ggplot(plotDF, aes(x=condition2, y=olap))+
-    geom_bar(stat="identity", fill="#f768a1")+
-    coord_flip()+
-    ylab("#eGenes")+    
-    theme_bw()+
-    theme(legend.title=element_blank(),
-          axis.title.x=element_text(size=10),
-          axis.title.y=element_blank(),
-          axis.text=element_text(size=8))
+## ##
+## p0 <- ggplot(plotDF, aes(x=condition2, y=olap))+
+##     geom_bar(stat="identity", fill="#f768a1")+
+##     coord_flip()+
+##     ylab("#eGenes")+    
+##     theme_bw()+
+##     theme(legend.title=element_blank(),
+##           axis.title.x=element_text(size=10),
+##           axis.title.y=element_blank(),
+##           axis.text=element_text(size=8))
 
-figfn <- paste(outdir, "Figure_S5_1_eGenes.bar.png", sep="")
-ggsave(figfn, p0, width=380, height=450, units="px", dpi=120)
+## figfn <- paste(outdir, "Figure_S5_1_eGenes.bar.png", sep="")
+## ggsave(figfn, p0, width=380, height=450, units="px", dpi=120)
 
 
 
@@ -519,9 +573,6 @@ p0 <- ggplot(plotDF%>%filter(ny>3), aes(x=motif_name2, y=ny))+
 
 figfn <- paste(outdir, "Figure_S5_4.bar.png", sep="")
 ggsave(figfn, p0, width=380, height=450, units="px", dpi=120)
-
-
-
 
 
 ###
