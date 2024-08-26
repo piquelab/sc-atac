@@ -19,5 +19,10 @@ We performed the TWAS analysis using SMR approach by integrating the two eQTL co
 - `2_GTEx_wbl.R`, TWAS using SMR for GTEx Whole blood cohort, the topPIP with annotation and minP
 - `3_twas_summary.R`, summarize TWAS results, density, histogram plots and qq plots 
 - `4_INTACT_summ.R`, run intact to combine TWAS and colocalization. Also combine all information for output file, including, twas, colocalization, pval and PIP for eqtl and annotation
-- `5.1_plots_main.R`, `5.2_plots_supp.R` and `5.3_get_genes_table.R`, script for main figures, supp figures and tables in the manuscript
+- `5.1_plots_main.R` and `5.2_plots_supp.R` script for main figures, supp figures and tables in the manuscript
+- `5.3_get_genes_table.R` script for supp tables from ALOFT eQTL analysis; `5.3_get_genes_table_gtex.R` for supp table from GTEx WBL eQTL analysis
+- `5.4_plots_example_pubs.R` script for example genes from ALOFT eQTL; `5.4_plots_example_pubs_gtex.R` script for example genes from GTEx WBL eQTL
+- `5.4_plots_example_pubs_final.R` script for example genes in main figure from ALOFT eQTL
+ 
+
  
