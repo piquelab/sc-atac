@@ -2,6 +2,9 @@
 library(tidyverse)
 ## library(parallel)
 library(data.table)
+library(CENTIPEDE)
+### https://slowkow.github.io/CENTIPEDE.tutorial/
+## https://github.com/slowkow/CENTIPEDE.tutorial 
 ## library(purrr)
 library(GenomicRanges)
 library(Seurat)
@@ -9,21 +12,21 @@ library(SeuratDisk)
 library(SeuratData)
 library(SeuratObject)
 library(Signac)
-library(SeuratWrappers)
-library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
-library(monocle3)
-library(EnsDb.Hsapiens.v75)
+## library(SeuratWrappers)
+## library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+## library(monocle3)
+## library(EnsDb.Hsapiens.v75)
 ###
 library(ggplot2)
 library(patchwork)
 library(cowplot)
 library(RColorBrewer)
 library(viridis)
-library(ggrastr)
-theme_set(theme_grey())
+## library(ggrastr)
+## theme_set(theme_grey())
 
 rm(list=ls())
-
+ 
 ###
 ###
 outdir <- "./6_pub.outs/1_main_plots/"
@@ -31,6 +34,15 @@ if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
 
 ## outdir <- "./6_pub.outs/poster/"
 ## if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
+
+
+
+########################################
+### demo TF binding footprints
+########################################
+
+
+
 
 
 
@@ -53,10 +65,10 @@ col2 <- c("#4daf4a", "#828282", "#984ea3", "#aa4b56", "#ffaa00")
 
 ## col2 <- c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00", "DC"="#828282")
           
-p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCl2", cols=col2, label=T, label.size=5, raster=F)+
+p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCl2", cols=col2, pt.size=0.5, label=T, label.size=5, raster=F)+
    theme_bw()+   
    xlab("UMAP_1")+ylab("UMAP_2")+ 
-   theme(##legend.position="none",
+   theme(legend.position="none",
          plot.title=element_blank(),
          axis.text=element_text(size=12),
          axis.title=element_text(size=12))
@@ -65,7 +77,7 @@ p0 <- DimPlot(atac, reduction="umap.atac", group.by="MCl2", cols=col2, label=T, 
    ## theme(legend.title=element_blank(),
    ##       legend.key.size=grid::unit(0.8,"lines"))
 figfn <- paste(outdir, "Figure1.1_umap_atac.MCls.png", sep="")
-png(figfn, width=480, height=500, res=120)
+png(figfn, width=480, height=500, res=130)
 print(p0)
 dev.off()
 
@@ -100,7 +112,7 @@ rm(list=ls())
 
 outdir <- "./6_pub.outs/1_main_plots/"
 
-source("annot_plot.R")
+## source("annot_plot.R")
 
 fn <- "./4.2_Integrate.outs/3_scATAC.annot.rds"
 atac <- read_rds(fn)
@@ -160,14 +172,16 @@ figs_ls <- lapply(1:5, function(i){
       group.by="MCls", extend.upstream=1e+03, extend.downstream=1e+03, links=F)&
    scale_fill_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3",
        "NKcell"="#aa4b56", "Tcell"="#ffaa00","DC"="#828282"))&
-   ylab("Normalized accessibility")&       
+   ##ylab("Normalized accessibility")&       
    ggtitle(bquote(~italic(.(geneId))))&
    theme(legend.position="none",
          plot.title=element_text(hjust=0.5), 
          axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
          axis.text.x=element_blank(),
          axis.ticks.x=element_blank(),
          axis.ticks.y=element_blank(),
+         axis.line=element_line(linewidth=0.4),
          strip.text.y.left=element_blank())
 
   ## gene annotation
@@ -176,20 +190,21 @@ figs_ls <- lapply(1:5, function(i){
   p2 <- AnnotationPlot(atac, region=region)&
      theme(axis.title.x=element_blank(),
            axis.text.x=element_blank(),
+           axis.line=element_line(linewidth=0.4),
            axis.ticks.x=element_blank(),
            axis.title.y=element_blank())
   ##  
   ll <- length(p2$layers)
-   p2$layers[[ll]]$aes_params$size <- 3
+  p2$layers[[ll]]$aes_params$size <- 3.5
   p2$layers[[ll]]$aes_params$fontface <- "italic"  
   ###  
-  p <- wrap_plots(p1, p2, ncol=1, heights=c(8, 1.2))  
+  p <- wrap_plots(p1, p2, ncol=1, heights=c(8, 1.5))  
   ##        
   p
 })
 
 ###
 figfn <- paste(outdir, "Figure1c_MCls.coverage.png", sep="")
-png(figfn, width=700, height=360, res=100)
+png(figfn, width=720, height=360, res=100)
 plot_grid(plotlist=figs_ls, ncol=5)
 dev.off()

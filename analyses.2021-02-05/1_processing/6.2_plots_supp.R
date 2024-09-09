@@ -10,9 +10,9 @@ library(SeuratData)
 library(SeuratObject)
 library(Signac)
 library(SeuratWrappers)
-library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
-library(monocle3)
-library(EnsDb.Hsapiens.v75)
+## library(cicero, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+## library(monocle3)
+## library(EnsDb.Hsapiens.v75)
 ###
 library(ggplot2)
 library(cowplot)
@@ -85,7 +85,7 @@ fig1 <- ggplot(dd2, aes(x=treat2, y=ncell, fill=treat2))+
 fig2 <- ggplot(dd2,aes(x=treat2, y=reads, fill=treat2))+
    geom_violin()+xlab("")+ylab("")+ylim(3000, 12000)+
    geom_boxplot(width=0.2, color="grey", outlier.shape=NA)+     
-   ggtitle("#UMIs per cell")+
+   ggtitle("#Reads per cell")+
    scale_fill_manual(values=col1)+
    scale_x_discrete(labels=lab1)+
    theme_bw()+
@@ -113,6 +113,38 @@ figfn <- paste(outdir, "FigS1_1_violin.pdf", sep="")
 pdf(figfn, width=10, height=5)
 print(plot_grid(fig1, fig2, fig3, labels="AUTO", label_fontface="plain", label_x=0.1,  ncol=3))
 dev.off()
+
+
+
+#################################
+### supplementary tables 
+################################
+
+
+dd2 <- meta2%>%group_by(SNG.BEST.GUESS, treat2)%>%
+   summarise(ncell=n(), reads=mean(nCount_ATAC), ngene=mean(nFeature_ATAC),.groups="drop")%>%ungroup()
+dd2 <- dd2%>%mutate(comb=paste(SNG.BEST.GUESS, treat2, sep="_")) 
+                    
+### number of cells
+x2 <- meta2%>%group_by(SNG.BEST.GUESS, treat2, MCls)%>%summarize(ncell=n(), .groups="drop")%>%
+    ungroup()%>%
+    mutate(comb=paste(SNG.BEST.GUESS, treat2, sep="_"))
+
+summ <- x2%>%pivot_wider(id_cols=comb, names_from=MCls, values_from=ncell, values_fill=0)
+dd2 <- dd2%>%left_join(summ, by="comb")
+ 
+dd_summ <- dd2%>%
+    dplyr::select(comb, individual=SNG.BEST.GUESS, treatment=treat2, ncell, reads, npeaks=ngene,
+                  Bcell, Monocyte, NKcell, Tcell, DC)
+
+dd_summ <- dd_summ%>%mutate(reads=round(reads, 3), npeaks=round(npeaks, 3))
+
+###
+### output
+opfn <- paste(outdir, "TableS1_0_summary.tsv", sep="")
+write_tsv(dd_summ, opfn) 
+
+
 
 
 
@@ -171,14 +203,13 @@ dev.off()
 
  
 ### 3,
-
 Labtreat <- c("LPS"="LPS", "LPS-DEX"="LPS+DEX", "PHA"="PHA", "PHA-DEX"="PHA+DEX", "CTRL"="CTRL")
 ##
 p3 <- ggplot(df2, aes(x=UMAP_1, y=UMAP_2, colour=factor(MCls)))+
    rasterise(geom_point(size=0.1), dpi=300)+
    facet_wrap(~factor(treat2), ncol=3, nrow=2, dir="v", labeller=as_labeller(Labtreat))+
-   scale_colour_manual(values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56",
-                                "Tcell"="#ffaa00","DC"="#828282"),
+   scale_colour_manual(
+       values=c("Bcell"="#4daf4a", "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00","DC"="#828282"),
       labels=c("Bcell"="B cell", "Monocyte"="Monocyte", "NKcell"="NK cell", "Tcell"="T cell", "DC"="DC"),
       guide=guide_legend(override.aes=list(size=2)))+    
    ##guides(col=guide_legend(override.aes=list(size=2),ncol=3))+
@@ -202,19 +233,52 @@ dev.off()
 ###
 ### 4, suggetst option
 
+umap <- as.data.frame(atac[["umap.atac"]]@cell.embeddings)
+x <- atac@meta.data
+
+df2 <- data.frame(UMAP_1=umap[,1],
+   UMAP_2=umap[,2],
+   seurat_clusters=x$seurat_clusters,
+   treat=gsub("-", "+", gsub(".*-ATAC-|_.*", "", x$NEW_BARCODE)),
+   Batch=gsub("-.*", "", x$NEW_BARCODE),
+   MCls=x$MCls)
+
+###
+treat <- sort(unique(df2$treat))
+plotDF <- map_dfr(treat, function(ii){
+   ##
+   df2 <- df2%>%mutate(treat_col=ifelse(treat==ii, treat, "bg"))%>%arrange(desc(treat_col))
+   df2$treat_facet <- ii
+   df2
+})    
+
+
+treat_val <- c("LPS"=1, "LPS+DEX"=2, "PHA"=3, "PHA+DEX"=4, "CTRL"=5)
+
+plotDF <- plotDF%>%
+    mutate(treat_value=as.numeric(treat_val[as.character(treat_facet)]),
+           treat2_facet=fct_reorder(treat_facet, treat_value))  
+
+
 col1 <- c("CTRL"="#828282", "LPS"="#fb9a99", "LPS+DEX"="#e31a1c",
-   "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")
-df2 <- df2%>%mutate(treat3=gsub("-", "+", treat))
+   "PHA"="#a6cee3", "PHA+DEX"="#1f78b4", "bg"="#c7e9c0")
+### "bg"="#bdbdbd") ##, 
 ##
-p4 <- ggplot(df2, aes(x=UMAP_1, y=UMAP_2, colour=factor(treat3)))+
-   rasterise(geom_point(size=0.1), dpi=300)+
-   ## facet_wrap(~factor(treat2), ncol=3, nrow=2, dir="v", labeller=as_labeller(Labtreat))+    
+p4 <- ggplot(plotDF, aes(x=UMAP_1, y=UMAP_2))+
+   rasterise(geom_point(aes(colour=factor(treat_col), alpha=treat_col), size=0.4), dpi=300)+
+   facet_wrap(~factor(treat2_facet), ncol=3, nrow=2, dir="v")+
    scale_colour_manual(values=col1,
-      guide=guide_legend(override.aes=list(size=2)))+    
+      breaks=c("bg", "CTRL", "LPS", "LPS+DEX", "PHA", "PHA+DEX"),
+      labels=c("bg"="Not in condition", "CTRL"="CTRL", "LPS"="LPS", "LPS+DEX"="LPS+DEX",
+             "PHA"="PHA", "PHA+DEX"="PHA+DEX"),
+      guide=guide_legend(override.aes=list(size=2)))+
+   scale_alpha_manual(values=c("CTRL"=1, "LPS"=1, "LPS+DEX"=1, "PHA"=1, "PHA+DEX"=1, "bg"=0.4),
+                      guide="none")+
+   ##guides(col=guide_legend(override.aes=list(size=2),ncol=3))+
    theme_bw()+
    theme(strip.text=element_text(size=14),
          legend.title=element_blank(),
-         ## legend.position=c(0.85,0.25),
+         legend.position=c(0.85, 0.25),
          legend.background=element_blank(),
          legend.box.background=element_blank(),
          legend.key.size=grid::unit(1,"lines"),
@@ -222,10 +286,38 @@ p4 <- ggplot(df2, aes(x=UMAP_1, y=UMAP_2, colour=factor(treat3)))+
          axis.text=element_text(size=12),
          axis.title=element_text(size=12))
 
-figfn <- paste(outdir, "FigS1_2_umap_color_treat.pdf", sep="")
-pdf(figfn, width=6, height=5)
+figfn <- paste(outdir, "FigS1_2_umap_treat_suggest.pdf", sep="")
+pdf(figfn, width=8, height=6)
 print(p4)
 dev.off()
+
+
+
+
+## col1 <- c("CTRL"="#828282", "LPS"="#fb9a99", "LPS+DEX"="#e31a1c",
+##    "PHA"="#a6cee3", "PHA+DEX"="#1f78b4")
+## df2 <- df2%>%mutate(treat3=gsub("-", "+", treat))
+## ##
+## p4 <- ggplot(df2, aes(x=UMAP_1, y=UMAP_2, colour=factor(treat3)))+
+##    rasterise(geom_point(size=0.1), dpi=300)+
+##    ## facet_wrap(~factor(treat2), ncol=3, nrow=2, dir="v", labeller=as_labeller(Labtreat))+    
+##    scale_colour_manual(values=col1,
+##       guide=guide_legend(override.aes=list(size=2)))+    
+##    theme_bw()+
+##    theme(strip.text=element_text(size=14),
+##          legend.title=element_blank(),
+##          ## legend.position=c(0.85,0.25),
+##          legend.background=element_blank(),
+##          legend.box.background=element_blank(),
+##          legend.key.size=grid::unit(1,"lines"),
+##          legend.text=element_text(size=12),
+##          axis.text=element_text(size=12),
+##          axis.title=element_text(size=12))
+
+## figfn <- paste(outdir, "FigS1_2_umap_color_treat.pdf", sep="")
+## pdf(figfn, width=6, height=5)
+## print(p4)
+## dev.off()
 
 
 
