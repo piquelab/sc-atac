@@ -1,5 +1,7 @@
 # New script for Identification of Asthma risk genes with the combination of TWAS and colocaliation
 
+try
+
 The working directory is is in the path `/nfs/rprdata/julong/sc-atac/twas_analysis_2022-10-16/analysis2/`.
 
 ## Prepare gwas file in the `2_gwas_prepare` 
