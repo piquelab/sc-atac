@@ -42,8 +42,10 @@ library(ComplexHeatmap)
 library(viridis)
 library(ggrastr)
 library(openxlsx)
+library(scales)
+
 ##
-library(ggtext, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
+library(ggtext) ##, lib.loc="/wsu/home/ha/ha21/ha2164/Bin/Rpackages/")
 library(glue)
 
 
@@ -66,7 +68,15 @@ sigs <- res2%>%group_by(MCls, contrast, direction)%>%
    summarise(ny=n(), .groups="drop")%>%
    mutate(ny2=ifelse(direction==0, -ny, ny))
 
+### new label
+sigs <- sigs%>%
+    mutate(ny3=as.character(ny),
+           nn=nchar(ny3),
+           lab2=ifelse(nn>3, paste(substr(ny3, 1, nn-3), ",", substr(ny3, nn-2, nn), sep=""), ny3)) 
+
+### 
 breaks_value <- pretty(c(-12000, 15000), 8)
+breaks_lab <- c("15,000", "10,000", "5,000", "0", "5,000", "10,000", "15,000")
 
 p <- ggplot(sigs, aes(x=MCls, y=ny2))+
    geom_bar(aes(fill=factor(MCls), alpha=factor(direction)), stat="identity")+
@@ -74,10 +84,10 @@ p <- ggplot(sigs, aes(x=MCls, y=ny2))+
       "Monocyte"="#984ea3", "NKcell"="#aa4b56", "Tcell"="#ffaa00"))+
    scale_alpha_manual(values=c("0"=0.5, "1"=1))+
    geom_hline(yintercept=0, color="grey60")+
-   geom_text(aes(x=MCls, y=ny2, label=abs(ny2),
-      vjust=ifelse(direction==1, -0.2, 1.2)), size=3)+
+   geom_text(aes(x=MCls, y=ny2, label=lab2,
+      vjust=ifelse(direction==1, -0.2, 1.2)), size=2.5)+
    scale_y_continuous("", breaks=breaks_value, limits=c(-13000,16000),
-                      labels=abs(breaks_value))+
+                      labels=breaks_lab)+
    scale_x_discrete(labels=c("Bcell"="B cell", "DC"="DC", "Monocyte"="Monocyte",
                              "NKcell"="NK cell", "Tcell"="T cell"))+ 
    facet_grid(~contrast,
@@ -358,7 +368,7 @@ df1 <- data.frame(odds=df$odds,
 
 
 
-df1 <- df1%>%full_join(tmp2, by="comb")
+## df1 <- df1%>%full_join(tmp2, by="comb")
 
 
 p1 <- ggplot(df1, aes(x=odds, y=comb))+
@@ -393,6 +403,8 @@ df2 <- data.frame(odds=df$odds,
    CI.low=df$lower, CI.high=df$upper,
    comb=gsub("-", "+", gsub("_", ".", df$comb)),
    MCls=df$cell, contrast=df$contrast)
+
+## df2 <- df2%>%full_join(tmp2, by="comb")
 
 p2 <- ggplot(df2, aes(x=odds, y=comb))+
    geom_errorbarh(aes(xmax=CI.high, xmin=CI.low, colour=MCls),
