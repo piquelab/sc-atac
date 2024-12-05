@@ -116,6 +116,8 @@ res3 <- res%>%filter(symbol%in%geneSel)
 
 
 
+
+
 ###############
 ### plots-1 ###
 ###############
@@ -394,11 +396,17 @@ p4$layers[[ii]]$aes_params$size <- 0
 }    
     
 ###
+## comb <- plot_grid(p1, p2, p3, p4, align="hv", axis="lr", nrow=4, rel_heights=c(0.6, 0.6, 0.6, 0.3))
+## figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_1.comb.png", sep="")       
+## png(figfn, width=800, height=1050, res=120)
+## print(comb)
+## dev.off()
+    
 comb <- plot_grid(p1, p2, p3, p4, align="hv", axis="lr", nrow=4, rel_heights=c(0.6, 0.6, 0.6, 0.3))
-figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_1.comb.png", sep="")       
-png(figfn, width=800, height=1050, res=120)
+figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_1.comb.pdf", sep="")       
+pdf(figfn, width=6, height=7.875)
 print(comb)
-dev.off()
+dev.off()    
 
 }
 
@@ -721,10 +729,21 @@ if ( sum(sel)==3){
 comb <- plot_grid(pp2, pp_ls[[1]], pp_ls[[2]], pp_ls[[3]],
     align="hv", axis="lr", nrow=4, rel_heights=c(1, 1, 1, 1))
   
-figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.png", sep="")       
-png(figfn, width=800, height=800, res=120)
+## figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.png", sep="")       
+## png(figfn, width=800, height=800, res=120)
+## print(comb)
+## dev.off()
+
+##
+figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.pdf", sep="")
+
+cat(figfn, "\n")
+    
+pdf(figfn, width=6, height=6)
 print(comb)
 dev.off()
+    
+
 ###
 }else{    
 ### 2-genotype
@@ -733,10 +752,18 @@ pi_2 <- which(sel)[2]
 comb <- plot_grid(pp2, pp_ls[[pi_1]], pp_ls[[pi_2]], 
     align="hv", axis="lr", nrow=3, rel_heights=c(1, 1, 1))
   
-figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.png", sep="")       
-png(figfn, width=800, height=750, res=120)
+## figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.png", sep="")       
+## png(figfn, width=800, height=750, res=120)
+## print(comb)
+## dev.off()
+
+figfn <- paste(outdir2, "Figure", "_", ens, "_", symbol2, "_", chr_i, "_2.peak.pdf", sep="")
+
+cat(figfn, "\n")
+    
+pdf(figfn, width=6, height=5.625)
 print(comb)
-dev.off()
+dev.off()    
     
 } ##
 
@@ -770,6 +797,10 @@ dev.off()
 
 ## }
 
+
+## fn <- "./5_pub.outs/2_supp_tables/TableS5_2_asthma-risk-genes_in_response_ALOFT.txt.gz"
+## res <- fread(fn, header=T, sep="\t", data.table=F)
+## res <- res%>%filter(PIP>0.1)
 
 
 #####################
