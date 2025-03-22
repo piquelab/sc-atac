@@ -2,7 +2,7 @@
 
 
 ### ALOFT_eQTL results `/nfs/rprdata/ALOFT/AL1-6_ln/FastQTL_corrected/nominals/output/PC1-18.nominals.eQTL.txt.gz`
-
+### FastQTL script `/nfs/rprdata/ALOFT/AL1-6_ln/FastQTL_corrected/nominals/run.FastQTL.txt` default 1MB 
 
 The file structure of directory
 - The `1_prepare_map.R` file used for preparing torus input files;
