@@ -5,7 +5,7 @@
 perl batch_process.pl -e ./expressions/ALOFT.bed.gz -g ALOFT.vcf.gz -c ./covar/ALOFT_18_GEPCs.txt -t ALOFT
 ```
 
-### 2rd step, assemble expression, covariates and SNPs into ENSG.sbams.dat file
+### 2nd step, assemble expression, covariates and SNPs into ENSG.sbams.dat file
 ```ruby
 bash 2_batch_assemble_submit.sh
 ```
