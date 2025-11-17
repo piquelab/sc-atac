@@ -324,7 +324,7 @@ write.table(DF, file=opfn, quote=F, row.names=F, sep="\t")
 ### summary the results of risk genes  
 #############################################
 
-  
+   
 fn <- paste(outdir, "TableS5_1_asthma-risk-genes_ALOFT.txt.gz", sep="")
 res <- fread(fn, header=T, sep="\t", data.table=F)
 res <- res%>%filter(FDR_intact<0.1)
@@ -333,6 +333,9 @@ res <- res%>%filter(FDR_intact<0.1)
 fn <- paste(outdir, "TableS6_1_asthma-risk-genes_gtex.txt.gz", sep="")
 res2 <- fread(fn, header=T, sep="\t", data.table=F)
 res2 <- res2%>%filter(FDR_intact<0.1)
+
+length(unique(c(res$Gene, res2$Gene)))
+### 410 risk genes for GTEx and ALOFT
 
 
 
