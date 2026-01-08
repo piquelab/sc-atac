@@ -31,7 +31,7 @@ theme_set(theme_grey())
 rm(list=ls())
 
 ###
-outdir <- "./2_motif.activities.outs/"
+outdir <- "./2_motif.activities.outs/Updated_JW_2026_01_07/"
 if (!file.exists(outdir)) dir.create(outdir, showWarnings=F, recursive=T)
  
 ##
@@ -60,6 +60,13 @@ write_rds(atac, opfn)
 atac <- read_rds("./2_motif.activities.outs/1_scATAC.motifActivities.rds")
 atac2 <- subset(atac, subset=MCls!="DC")
 
+
+motif <- Motifs(atac)
+x <- unlist(motif@motif.names)
+motif.name <- x
+motif.id <- names(x)
+names(motif.id) <- motif.name
+
 Y <- atac2@assays$chromvar@data
 meta <- atac2@meta.data%>%
    mutate(treat=gsub(".*-ATAC-|_.*", "", NEW_BARCODE),
@@ -79,13 +86,23 @@ YtX <- Y %*% X
 YtX <- as.matrix(YtX)
 colnames(YtX) <- gsub("^bti", "", colnames(YtX))
 
+YtX <- YtX[, as.character(dd$bti)]
+
+cat("The same name for YtX and dd", identical(as.character(colnames(YtX)), as.character(dd$bti)), "\n")
+## x <- str_split(colnames(YtX), "_", simplify=T)
+## x2 <- str_split(dd$bti, "_", simplify=T)
+## sum(colnames(YtX)==dd$bti)
+
 YtX_ave <- sweep(YtX, 2, dd$ncell, "/")
 
 dd0 <- dd%>%dplyr::filter(ncell>20)
+ 
+YtX_sel <- YtX_ave[, dd0$bti]
 
-YtX_sel <- YtX_ave[,dd0$bti]
+rownames(YtX_sel) <- motif.name[rownames(YtX_sel)]
 
-write_rds(YtX_sel, "./2_motif.activities.outs/2_motif.ave.rds")
+opfn <- paste(outdir, "2_motif.ave.rds", sep="")
+write_rds(YtX_sel, opfn)
 
 
 ###
@@ -172,8 +189,8 @@ myDE <- function(y, X, gene){
 } ###
 
 
-
-mat <- read_rds("./2_motif.activities.outs/2_motif.ave.rds")
+fn <- paste(outdir, "2_motif.ave.rds", sep="")
+mat <- read_rds(fn)
 bti <-colnames(mat)
 cvt0 <- str_split(bti, "_", simplify=T)%>%as.data.frame()
 cvt <- data.frame(bti=bti, MCls=cvt0[,1], treat=cvt0[,2], sampleID=cvt0[,3])
@@ -195,7 +212,7 @@ res <- map_dfr(MCls, function(oneMCl){
    TMP <- do.call(rbind, TMP)%>%as.data.frame()%>%mutate(MCls=oneMCl)
    TMP 
 })    
-
+ 
 ### add qvalue
 res2 <- res%>%group_by(MCls, contrast)%>%
    mutate(qval=p.adjust(pval, "BH"))%>%
@@ -212,7 +229,7 @@ names(motif.id) <- motif.name
 res2 <- res2%>%mutate(motif=motif.id[gene])
     
 ###
-opfn <- "./2_motif.activities.outs/3.2_indi_motif.diff.results.rds"
+opfn <- paste(outdir, "3.2_indi_motif.diff.results.rds", sep="")
 write_rds(res2, opfn)
 
 
@@ -227,7 +244,7 @@ write_rds(res2, opfn)
 ### show heatmap ofsignificant motif ###
 ########################################
 
-res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
+res <- read_rds("./2_motif.activities.outs/Updated_JW_2026_01_07/3.2_indi_motif.diff.results.rds")
 
 
 ###
@@ -626,6 +643,8 @@ for (i in 1:4){
 ### define response motif (3) ###
 #################################
 
+###
+### default define response motifs
 ### union of treatment motifs
 
 res <- read_rds("./2_motif.activities.outs/3_motif.diff.results.rds")
@@ -656,6 +675,18 @@ for (i in 1:4){
    ##
    cat(oneMCl, nrow(res2),  nrow(df2), th0, length(unique(res2$gene)), "\n")
 }
+
+##
+ 
+MCls <- c("Bcell", "Monocyte", "NKcell", "Tcell")
+res <- map_dfr(1:4, function(i){
+    ##
+    fn <- paste(outdir, "7.", i, "_", MCls[i], "_union.motif.txt", sep="")
+    df2 <- read.table(fn, header=T)
+    df2
+})    
+##
+length(unique(res$gene)) ## 354 response motifs
 
 
 
